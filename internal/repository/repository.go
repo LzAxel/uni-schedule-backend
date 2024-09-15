@@ -27,7 +27,6 @@ type TeacherRepository interface {
 type LessonRepository interface {
 	Create(lesson lessonmodel.Lesson) (domain.ID, error)
 	GetByID(id domain.ID) (lessonmodel.Lesson, error)
-	GetByTeacher(teacherID int) ([]lessonmodel.Lesson, error)
 	Update(id domain.ID, update lessonmodel.LessonUpdate) error
 	Delete(id domain.ID) error
 }

@@ -53,31 +53,6 @@ func (r *LessonRepo) GetByID(id domain.ID) (model.Lesson, error) {
 	return lesson, nil
 }
 
-func (r *LessonRepo) GetByTeacher(teacherID int) ([]model.Lesson, error) {
-	query, args, err := r.psql.Select("*").From("lessons").
-		Where(squirrel.Eq{"teacher_id": teacherID}).
-		ToSql()
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := r.db.Query(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var lessons []model.Lesson
-	for rows.Next() {
-		var lesson model.Lesson
-		if err := rows.Scan(&lesson.ID, &lesson.Name, &lesson.Location, &lesson.TeacherID, &lesson.LessonType); err != nil {
-			return nil, err
-		}
-		lessons = append(lessons, lesson)
-	}
-	return lessons, nil
-}
-
 func (r *LessonRepo) Update(id domain.ID, update model.LessonUpdate) error {
 	q := r.psql.Update("lessons").Where(squirrel.Eq{"id": id})
 

@@ -1,5 +1,7 @@
 package main
 
+import "uni-schedule-backend/internal/app"
+
 func main() {
 	/*
 				ENDPOINTS:
@@ -21,4 +23,6 @@ func main() {
 
 	*/
 
+	appInstance := app.New()
+	appInstance.Init()
 }

@@ -1,0 +1,11 @@
+app:
+  logLevel: INFO
+  port: 3000
+
+postgres:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  dbName: postgres
+  sslMode: disable
