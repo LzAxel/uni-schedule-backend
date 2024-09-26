@@ -2,14 +2,15 @@ package repository
 
 import (
 	"uni-schedule-backend/internal/domain"
-	lessonmodel "uni-schedule-backend/internal/lesson/model"
-	schedulemodel "uni-schedule-backend/internal/schedule/model"
-	teachermodel "uni-schedule-backend/internal/teacher/model"
-	usermodel "uni-schedule-backend/internal/user/model"
+	tokenmodel "uni-schedule-backend/internal/domain/auth/model"
+	lessonmodel "uni-schedule-backend/internal/domain/lesson/model"
+	"uni-schedule-backend/internal/domain/schedule/model"
+	teachermodel "uni-schedule-backend/internal/domain/teacher/model"
+	usermodel "uni-schedule-backend/internal/domain/user/model"
 )
 
 type UserRepository interface {
-	Create(user usermodel.User) (domain.ID, error)
+	Create(user usermodel.UserCreate) (domain.ID, error)
 	GetByID(id domain.ID) (usermodel.User, error)
 	GetByUsername(username string) (usermodel.User, error)
 	Update(id domain.ID, update usermodel.UserUpdateDTO) error
@@ -32,20 +33,27 @@ type LessonRepository interface {
 }
 
 type ScheduleRepository interface {
-	Create(schedule schedulemodel.Schedule) (domain.ID, error)
-	GetByID(id domain.ID) (schedulemodel.Schedule, error)
-	Update(id domain.ID, update schedulemodel.ScheduleUpdate) error
+	Create(schedule model.Schedule) (domain.ID, error)
+	GetByID(id domain.ID) (model.Schedule, error)
+	Update(id domain.ID, update model.ScheduleUpdate) error
 	Delete(id domain.ID) error
 }
 
 type ScheduleSlotRepository interface {
-	Create(slot schedulemodel.ScheduleSlot) (domain.ID, error)
-	GetByID(id domain.ID) (schedulemodel.ScheduleSlot, error)
-	Update(id domain.ID, update schedulemodel.ScheduleSlotUpdate) error
+	Create(slot model.ScheduleSlot) (domain.ID, error)
+	GetByID(id domain.ID) (model.ScheduleSlot, error)
+	Update(id domain.ID, update model.ScheduleSlotUpdate) error
 	Delete(id domain.ID) error
 }
 
+type TokenRepository interface {
+	CreateOrUpdate(token tokenmodel.RefreshToken) error
+	GetByUserID(userID domain.ID) (tokenmodel.RefreshToken, error)
+	Delete(userID domain.ID) error
+}
+
 type Repository struct {
+	Token        TokenRepository
 	User         UserRepository
 	Teacher      TeacherRepository
 	Lesson       LessonRepository

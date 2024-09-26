@@ -1,17 +1,18 @@
 package psql
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	lessonrepo "uni-schedule-backend/internal/lesson/repository"
+	tokenrepo "uni-schedule-backend/internal/domain/auth/repository"
+	lessonrepo "uni-schedule-backend/internal/domain/lesson/repository"
+	repository2 "uni-schedule-backend/internal/domain/schedule/repository"
+	teacherrepo "uni-schedule-backend/internal/domain/teacher/repository"
+	userrepo "uni-schedule-backend/internal/domain/user/repository"
 	"uni-schedule-backend/internal/repository"
-	schedulerepo "uni-schedule-backend/internal/schedule/repository"
-	teacherrepo "uni-schedule-backend/internal/teacher/repository"
-	userrepo "uni-schedule-backend/internal/user/repository"
 )
 
-func NewDBConnection(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", dsn)
+func NewDBConnection(dsn string) (*sqlx.DB, error) {
+	db, err := sqlx.Open("postgres", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -22,12 +23,13 @@ func NewDBConnection(dsn string) (*sql.DB, error) {
 	return db, nil
 }
 
-func NewPostgresRepository(db *sql.DB) *repository.Repository {
+func NewPostgresRepository(db *sqlx.DB) *repository.Repository {
 	return &repository.Repository{
+		Token:        tokenrepo.NewTokenRepo(db),
 		User:         userrepo.NewUserRepo(db),
 		Teacher:      teacherrepo.NewTeacherRepo(db),
 		Lesson:       lessonrepo.NewLessonRepo(db),
-		Schedule:     schedulerepo.NewScheduleRepo(db),
-		ScheduleSlot: schedulerepo.NewScheduleSlotRepo(db),
+		Schedule:     repository2.NewScheduleRepo(db),
+		ScheduleSlot: repository2.NewScheduleSlotRepo(db),
 	}
 }

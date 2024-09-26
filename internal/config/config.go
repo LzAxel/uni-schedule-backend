@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"sync"
+	"uni-schedule-backend/internal/jwt"
 	"uni-schedule-backend/internal/repository/psql"
 )
 
@@ -14,8 +15,9 @@ var (
 )
 
 type Config struct {
-	AppConfig AppConfig   `yaml:"app"`
-	Postgres  psql.Config `yaml:"postgres"`
+	AppConfig AppConfig     `yaml:"app"`
+	Postgres  psql.Config   `yaml:"postgres"`
+	JWT       jwt.JWTConfig `yaml:"jwt"`
 }
 
 func GetConfig() Config {

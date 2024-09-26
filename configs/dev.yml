@@ -1,6 +1,14 @@
 app:
   logLevel: INFO
   port: 3000
+  isDebug: true
+
+jwt:
+  issuer: uni-schedule-dev
+  accessTokenLifetime: 10m
+  refreshTokenLifetime: 48h
+  accessTokenSecret: accessTokenSecret
+  refreshTokenSecret: refreshTokenSecret
 
 postgres:
   host: localhost

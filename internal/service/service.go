@@ -1,17 +1,20 @@
 package service
 
 import (
+	"uni-schedule-backend/internal/config"
 	"uni-schedule-backend/internal/domain"
-	lessonmodel "uni-schedule-backend/internal/lesson/model"
+	tokenModel "uni-schedule-backend/internal/domain/auth/model"
+	authservice "uni-schedule-backend/internal/domain/auth/service"
+	lessonmodel "uni-schedule-backend/internal/domain/lesson/model"
+	lessonservice "uni-schedule-backend/internal/domain/lesson/service"
+	"uni-schedule-backend/internal/domain/schedule/model"
+	scheduleservice "uni-schedule-backend/internal/domain/schedule/service"
+	teachermodel "uni-schedule-backend/internal/domain/teacher/model"
+	teacherservice "uni-schedule-backend/internal/domain/teacher/service"
+	usermodel "uni-schedule-backend/internal/domain/user/model"
+	userservice "uni-schedule-backend/internal/domain/user/service"
+	"uni-schedule-backend/internal/jwt"
 	"uni-schedule-backend/internal/repository"
-	schedulemodel "uni-schedule-backend/internal/schedule/model"
-	teachermodel "uni-schedule-backend/internal/teacher/model"
-	usermodel "uni-schedule-backend/internal/user/model"
-
-	lessonservice "uni-schedule-backend/internal/lesson/service"
-	scheduleservice "uni-schedule-backend/internal/schedule/service"
-	teacherservice "uni-schedule-backend/internal/teacher/service"
-	userservice "uni-schedule-backend/internal/user/service"
 )
 
 type UserService interface {
@@ -38,18 +41,26 @@ type LessonService interface {
 }
 
 type ScheduleService interface {
-	CreateSchedule(schedule schedulemodel.Schedule) (domain.ID, error)
-	GetScheduleByID(id domain.ID) (schedulemodel.Schedule, error)
-	UpdateSchedule(id domain.ID, update schedulemodel.ScheduleUpdate) error
+	CreateSchedule(schedule model.Schedule) (domain.ID, error)
+	GetScheduleByID(id domain.ID) (model.Schedule, error)
+	UpdateSchedule(id domain.ID, update model.ScheduleUpdate) error
 	DeleteSchedule(id domain.ID) error
 
-	CreateSlot(slot schedulemodel.ScheduleSlot) (domain.ID, error)
-	GetSlotByID(id domain.ID) (schedulemodel.ScheduleSlot, error)
-	UpdateSlot(id domain.ID, update schedulemodel.ScheduleSlotUpdate) error
+	CreateSlot(slot model.ScheduleSlot) (domain.ID, error)
+	GetSlotByID(id domain.ID) (model.ScheduleSlot, error)
+	UpdateSlot(id domain.ID, update model.ScheduleSlotUpdate) error
 	DeleteSlot(id domain.ID) error
 }
 
+type AuthService interface {
+	Login(username, password string) (tokenModel.TokenPair, error)
+	Register(username, password string) (tokenModel.TokenPair, error)
+	RefreshToken(refreshToken string) (tokenModel.TokenPair, error)
+	GetUserFromAccessToken(accessToken string) (usermodel.User, error)
+}
+
 type Service struct {
+	Auth     AuthService
 	User     UserService
 	Teacher  TeacherService
 	Lesson   LessonService
@@ -57,7 +68,11 @@ type Service struct {
 }
 
 func NewService(repository *repository.Repository) *Service {
+	cfg := config.GetConfig()
+	jwtManager := jwt.NewJWTManager(cfg.JWT)
+
 	return &Service{
+		Auth:     authservice.NewAuthService(repository.User, repository.Token, jwtManager, cfg.AppConfig.PasswordSalt),
 		User:     userservice.NewUserService(repository.User),
 		Teacher:  teacherservice.NewTeacherService(repository.Teacher),
 		Lesson:   lessonservice.NewLessonService(repository.Lesson),

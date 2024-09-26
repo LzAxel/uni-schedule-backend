@@ -24,5 +24,5 @@ func main() {
 	*/
 
 	appInstance := app.New()
-	appInstance.Init()
+	appInstance.Run()
 }
