@@ -2,7 +2,6 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"time"
 	"uni-schedule-backend/internal/apperror"
 	"uni-schedule-backend/internal/domain"
@@ -46,18 +45,9 @@ func (s *AuthService) Login(username, password string) (domain.TokenPair, error)
 		return domain.TokenPair{}, apperror.ErrInvalidLoginOrPassword
 	}
 
-	tokenPair, err := s.generateTokenPair(user.ID)
+	tokenPair, err := s.generateAndStoreTokenPair(user.ID)
 	if err != nil {
 		return domain.TokenPair{}, apperror.NewServiceError("AuthService.Login:", err)
-	}
-
-	err = s.tokenRepo.CreateOrUpdate(domain.RefreshToken{
-		UserID:       user.ID,
-		RefreshToken: tokenPair.RefreshToken,
-		UpdatedAt:    time.Now().UTC(),
-	})
-	if err != nil {
-		return domain.TokenPair{}, apperror.NewServiceError("AuthService.Login: create or update token", err)
 	}
 
 	return tokenPair, nil
@@ -82,18 +72,9 @@ func (s *AuthService) Register(username, password string) (domain.TokenPair, err
 		return domain.TokenPair{}, apperror.NewServiceError("AuthService.Register: create user", err)
 	}
 
-	tokenPair, err := s.generateTokenPair(createdID)
+	tokenPair, err := s.generateAndStoreTokenPair(createdID)
 	if err != nil {
 		return domain.TokenPair{}, apperror.NewServiceError("AuthService.Register:", err)
-	}
-
-	err = s.tokenRepo.CreateOrUpdate(domain.RefreshToken{
-		UserID:       createdID,
-		RefreshToken: tokenPair.RefreshToken,
-		UpdatedAt:    time.Now().UTC(),
-	})
-	if err != nil {
-		return domain.TokenPair{}, apperror.NewServiceError("AuthService.Register: create or update token", err)
 	}
 
 	return tokenPair, nil
@@ -117,18 +98,9 @@ func (s *AuthService) RefreshToken(refreshToken string) (domain.TokenPair, error
 		return domain.TokenPair{}, apperror.ErrInvalidRefreshToken
 	}
 
-	tokenPair, err := s.generateTokenPair(userID)
+	tokenPair, err := s.generateAndStoreTokenPair(userID)
 	if err != nil {
 		return domain.TokenPair{}, apperror.NewServiceError("AuthService.RefreshToken:", err)
-	}
-
-	err = s.tokenRepo.CreateOrUpdate(domain.RefreshToken{
-		UserID:       userID,
-		RefreshToken: tokenPair.RefreshToken,
-		UpdatedAt:    time.Now().UTC(),
-	})
-	if err != nil {
-		return domain.TokenPair{}, apperror.NewServiceError("AuthService.RefreshToken: create or update token", err)
 	}
 
 	return tokenPair, nil
@@ -145,17 +117,4 @@ func (s *AuthService) GetUserFromAccessToken(accessToken string) (domain.User, e
 	}
 
 	return user, nil
-}
-
-func (s *AuthService) generateTokenPair(userID domain.ID) (domain.TokenPair, error) {
-	accessToken, err := s.jwtManager.GenerateAccessToken(userID)
-	if err != nil {
-		return domain.TokenPair{}, fmt.Errorf("generateTokenPair.GenerateAccessToken: %w", err)
-	}
-	refreshToken, err := s.jwtManager.GenerateRefreshToken(userID)
-	if err != nil {
-		return domain.TokenPair{}, fmt.Errorf("generateTokenPair.GenerateRefreshToken: %w", err)
-	}
-
-	return domain.NewTokenPair(accessToken, refreshToken), nil
 }
