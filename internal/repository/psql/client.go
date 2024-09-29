@@ -3,12 +3,12 @@ package psql
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	tokenrepo "uni-schedule-backend/internal/domain/auth/repository"
-	lessonrepo "uni-schedule-backend/internal/domain/lesson/repository"
-	repository2 "uni-schedule-backend/internal/domain/schedule/repository"
-	teacherrepo "uni-schedule-backend/internal/domain/teacher/repository"
-	userrepo "uni-schedule-backend/internal/domain/user/repository"
 	"uni-schedule-backend/internal/repository"
+	tokenrepo "uni-schedule-backend/internal/repository/auth"
+	lessonrepo "uni-schedule-backend/internal/repository/lesson"
+	"uni-schedule-backend/internal/repository/schedule"
+	teacherrepo "uni-schedule-backend/internal/repository/teacher"
+	userrepo "uni-schedule-backend/internal/repository/user"
 )
 
 func NewDBConnection(dsn string) (*sqlx.DB, error) {
@@ -29,7 +29,7 @@ func NewPostgresRepository(db *sqlx.DB) *repository.Repository {
 		User:         userrepo.NewUserRepo(db),
 		Teacher:      teacherrepo.NewTeacherRepo(db),
 		Lesson:       lessonrepo.NewLessonRepo(db),
-		Schedule:     repository2.NewScheduleRepo(db),
-		ScheduleSlot: repository2.NewScheduleSlotRepo(db),
+		Schedule:     schedule.NewScheduleRepo(db),
+		ScheduleSlot: schedule.NewScheduleSlotRepo(db),
 	}
 }

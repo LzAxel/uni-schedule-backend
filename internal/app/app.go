@@ -2,13 +2,13 @@ package app
 
 import (
 	"uni-schedule-backend/internal/config"
-	"uni-schedule-backend/internal/controller"
+	"uni-schedule-backend/internal/handler"
 	"uni-schedule-backend/internal/repository/psql"
 	"uni-schedule-backend/internal/service"
 )
 
 type App struct {
-	controller *controller.Controller
+	controller *handler.Controller
 }
 
 func New() App {
@@ -28,7 +28,7 @@ func (a *App) init() {
 	}
 	repo := psql.NewPostgresRepository(db)
 	serviceInstance := service.NewService(repo)
-	a.controller = controller.NewController(serviceInstance)
+	a.controller = handler.NewController(serviceInstance)
 }
 
 func (a *App) Run() {
