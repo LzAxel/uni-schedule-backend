@@ -10,10 +10,10 @@ import (
 )
 
 type JWTManager interface {
-	ParseAccessToken(token string) (domain.ID, error)
-	ParseRefreshToken(token string) (domain.ID, error)
-	GenerateAccessToken(userID domain.ID) (string, error)
-	GenerateRefreshToken(userID domain.ID) (string, error)
+	ParseAccessToken(token string) (uint64, error)
+	ParseRefreshToken(token string) (uint64, error)
+	GenerateAccessToken(userID uint64) (string, error)
+	GenerateRefreshToken(userID uint64) (string, error)
 }
 
 type AuthService struct {

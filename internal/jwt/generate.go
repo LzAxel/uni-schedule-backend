@@ -5,18 +5,17 @@ import (
 	"github.com/golang-jwt/jwt"
 	"strconv"
 	"time"
-	"uni-schedule-backend/internal/domain"
 )
 
-func (j *JWTManager) GenerateAccessToken(userID domain.ID) (string, error) {
+func (j *JWTManager) GenerateAccessToken(userID uint64) (string, error) {
 	return j.generateToken(j.accessTokenLifetime, j.accessTokenSecret, userID)
 }
 
-func (j *JWTManager) GenerateRefreshToken(userID domain.ID) (string, error) {
+func (j *JWTManager) GenerateRefreshToken(userID uint64) (string, error) {
 	return j.generateToken(j.refreshTokenLifetime, j.refreshTokenSecret, userID)
 }
 
-func (j *JWTManager) generateToken(tokenLifetime time.Duration, tokenSecret string, userID domain.ID) (string, error) {
+func (j *JWTManager) generateToken(tokenLifetime time.Duration, tokenSecret string, userID uint64) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		ExpiresAt: time.Now().UTC().Add(tokenLifetime).Unix(),
 		IssuedAt:  time.Now().UTC().Unix(),

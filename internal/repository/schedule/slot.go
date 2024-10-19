@@ -18,7 +18,7 @@ func NewScheduleSlotRepo(db *sqlx.DB) *ScheduleSlotRepo {
 	}
 }
 
-func (r *ScheduleSlotRepo) Create(slot domain.ScheduleSlot) (domain.ID, error) {
+func (r *ScheduleSlotRepo) Create(slot domain.ScheduleSlotCreate) (uint64, error) {
 	query, args, err := r.psql.Insert("schedule_slots").
 		Columns("schedule_id", "weekday", "number", "is_alternating", "even_week_lesson_id", "odd_week_lesson_id").
 		Values(slot.ScheduleID, slot.Weekday, slot.Number, slot.IsAlternating, slot.EvenWeekLessonID, slot.OddWeekLessonID).
@@ -28,7 +28,7 @@ func (r *ScheduleSlotRepo) Create(slot domain.ScheduleSlot) (domain.ID, error) {
 		return 0, err
 	}
 
-	var id domain.ID
+	var id uint64
 	err = r.db.QueryRow(query, args...).Scan(&id)
 	if err != nil {
 		return 0, err
@@ -36,7 +36,7 @@ func (r *ScheduleSlotRepo) Create(slot domain.ScheduleSlot) (domain.ID, error) {
 	return id, nil
 }
 
-func (r *ScheduleSlotRepo) GetByID(id domain.ID) (domain.ScheduleSlot, error) {
+func (r *ScheduleSlotRepo) GetByID(id uint64) (domain.ScheduleSlot, error) {
 	query, args, err := r.psql.Select("*").From("schedule_slots").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()
@@ -52,12 +52,25 @@ func (r *ScheduleSlotRepo) GetByID(id domain.ID) (domain.ScheduleSlot, error) {
 	return slot, nil
 }
 
-func (r *ScheduleSlotRepo) Update(id domain.ID, update domain.ScheduleSlotUpdate) error {
+func (r *ScheduleSlotRepo) GetAllSlotsByScheduleID(scheduleID uint64) ([]domain.ScheduleSlot, error) {
+	query, args, err := r.psql.Select("*").From("schedule_slots").
+		Where(squirrel.Eq{"schedule_id": scheduleID}).
+		ToSql()
+	if err != nil {
+		return []domain.ScheduleSlot{}, err
+	}
+
+	var slot = make([]domain.ScheduleSlot, 0)
+	err = r.db.Select(&slot, query, args...)
+	if err != nil {
+		return []domain.ScheduleSlot{}, err
+	}
+	return slot, nil
+}
+
+func (r *ScheduleSlotRepo) Update(id uint64, update domain.ScheduleSlotUpdate) error {
 	q := r.psql.Update("schedule_slots").Where(squirrel.Eq{"id": id})
 
-	if update.ScheduleID != nil {
-		q = q.Set("schedule_id", *update.ScheduleID)
-	}
 	if update.Weekday != nil {
 		q = q.Set("weekday", *update.Weekday)
 	}
@@ -68,10 +81,18 @@ func (r *ScheduleSlotRepo) Update(id domain.ID, update domain.ScheduleSlotUpdate
 		q = q.Set("is_alternating", *update.IsAlternating)
 	}
 	if update.EvenWeekLessonID != nil {
-		q = q.Set("even_week_lesson_id", *update.EvenWeekLessonID)
+		if *update.EvenWeekLessonID == 0 {
+			q = q.Set("even_week_lesson_id", nil)
+		} else {
+			q = q.Set("even_week_lesson_id", *update.EvenWeekLessonID)
+		}
 	}
 	if update.OddWeekLessonID != nil {
-		q = q.Set("odd_week_lesson_id", *update.OddWeekLessonID)
+		if *update.OddWeekLessonID == 0 {
+			q = q.Set("odd_week_lesson_id", nil)
+		} else {
+			q = q.Set("odd_week_lesson_id", *update.OddWeekLessonID)
+		}
 	}
 
 	query, args, err := q.ToSql()
@@ -83,7 +104,7 @@ func (r *ScheduleSlotRepo) Update(id domain.ID, update domain.ScheduleSlotUpdate
 	return err
 }
 
-func (r *ScheduleSlotRepo) Delete(id domain.ID) error {
+func (r *ScheduleSlotRepo) Delete(id uint64) error {
 	query, args, err := r.psql.Delete("schedule_slots").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()

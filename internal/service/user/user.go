@@ -16,7 +16,7 @@ func NewUserService(userRepo repository.UserRepository) *UserService {
 	}
 }
 
-func (s *UserService) Create(user domain.User) (domain.ID, error) {
+func (s *UserService) Create(user domain.User) (uint64, error) {
 	return s.userRepo.Create(domain.UserCreate{
 		Username:     user.Username,
 		PasswordHash: user.PasswordHash,
@@ -24,15 +24,15 @@ func (s *UserService) Create(user domain.User) (domain.ID, error) {
 		CreatedAt:    time.Now(),
 	})
 }
-func (s *UserService) GetByID(id domain.ID) (domain.User, error) {
+func (s *UserService) GetByID(id uint64) (domain.User, error) {
 	return s.userRepo.GetByID(id)
 }
 func (s *UserService) GetByUsername(username string) (domain.User, error) {
 	return s.userRepo.GetByUsername(username)
 }
-func (s *UserService) Update(id domain.ID, update domain.UserUpdateDTO) error {
+func (s *UserService) Update(id uint64, update domain.UserUpdateDTO) error {
 	return s.userRepo.Update(id, update)
 }
-func (s *UserService) Delete(id domain.ID) error {
+func (s *UserService) Delete(id uint64) error {
 	return s.userRepo.Delete(id)
 }

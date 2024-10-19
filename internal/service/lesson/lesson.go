@@ -15,15 +15,18 @@ func NewLessonService(repo repository.LessonRepository) *LessonService {
 	}
 }
 
-func (s *LessonService) Create(lesson domain.Lesson) (domain.ID, error) {
+func (s *LessonService) Create(lesson domain.LessonCreate) (uint64, error) {
+	if lesson.Name == "" {
+
+	}
 	return s.repo.Create(lesson)
 }
-func (s *LessonService) GetByID(id domain.ID) (domain.Lesson, error) {
+func (s *LessonService) GetByID(id uint64) (domain.Lesson, error) {
 	return s.repo.GetByID(id)
 }
-func (s *LessonService) Update(id domain.ID, update domain.LessonUpdate) error {
+func (s *LessonService) Update(id uint64, update domain.LessonUpdate) error {
 	return s.repo.Update(id, update)
 }
-func (s *LessonService) Delete(id domain.ID) error {
+func (s *LessonService) Delete(id uint64) error {
 	return s.repo.Delete(id)
 }

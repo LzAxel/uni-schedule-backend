@@ -5,9 +5,28 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"slices"
 	"strings"
 	"uni-schedule-backend/internal/apperror"
+	"uni-schedule-backend/internal/domain"
 )
+
+func (c *Controller) requiredRolesMiddleware(roles ...domain.Role) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			user, err := getUserFromContext(ctx)
+			if err != nil {
+				return c.handleAppError(ctx, err)
+			}
+
+			if !slices.Contains(roles, user.Role) {
+				return c.handleAppError(ctx, apperror.NewErrUserShoutHaveRole(roles...))
+			}
+
+			return next(ctx)
+		}
+	}
+}
 
 func (c *Controller) authMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {

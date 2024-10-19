@@ -1,7 +1,7 @@
 package domain
 
 type Teacher struct {
-	ID        ID
+	ID        uint64
 	ShortName string
 	FullName  string
 }
@@ -11,8 +11,13 @@ type TeacherUpdate struct {
 	FullName  *string
 }
 
+type TeacherCreate struct {
+	ShortName string
+	FullName  string
+}
+
 type TeacherView struct {
-	ID        ID     `json:"id"`
+	ID        uint64 `json:"id"`
 	ShortName string `json:"short_name"`
 	FullName  string `json:"full_name"`
 }

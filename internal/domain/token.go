@@ -3,7 +3,7 @@ package domain
 import "time"
 
 type RefreshToken struct {
-	UserID       ID        `db:"user_id"`
+	UserID       uint64    `db:"user_id"`
 	RefreshToken string    `db:"token"`
 	UpdatedAt    time.Time `db:"updated_at"`
 }

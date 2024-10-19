@@ -18,7 +18,7 @@ func NewTeacherRepo(db *sqlx.DB) *TeacherRepo {
 	}
 }
 
-func (r *TeacherRepo) Create(teacher domain.Teacher) (domain.ID, error) {
+func (r *TeacherRepo) Create(teacher domain.TeacherCreate) (uint64, error) {
 	query, args, err := r.psql.Insert("teachers").
 		Columns("short_name", "full_name").
 		Values(teacher.ShortName, teacher.FullName).
@@ -28,7 +28,7 @@ func (r *TeacherRepo) Create(teacher domain.Teacher) (domain.ID, error) {
 		return 0, err
 	}
 
-	var id domain.ID
+	var id uint64
 	err = r.db.QueryRow(query, args...).Scan(&id)
 	if err != nil {
 		return 0, err
@@ -36,7 +36,7 @@ func (r *TeacherRepo) Create(teacher domain.Teacher) (domain.ID, error) {
 	return id, nil
 }
 
-func (r *TeacherRepo) GetByID(id domain.ID) (domain.Teacher, error) {
+func (r *TeacherRepo) GetByID(id uint64) (domain.Teacher, error) {
 	query, args, err := r.psql.Select("*").From("teachers").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()
@@ -75,7 +75,7 @@ func (r *TeacherRepo) GetAll() ([]domain.Teacher, error) {
 	return teachers, nil
 }
 
-func (r *TeacherRepo) Update(id domain.ID, update domain.TeacherUpdate) error {
+func (r *TeacherRepo) Update(id uint64, update domain.TeacherUpdate) error {
 	q := r.psql.Update("teachers").Where(squirrel.Eq{"id": id})
 
 	if update.ShortName != nil {
@@ -94,7 +94,7 @@ func (r *TeacherRepo) Update(id domain.ID, update domain.TeacherUpdate) error {
 	return err
 }
 
-func (r *TeacherRepo) Delete(id domain.ID) error {
+func (r *TeacherRepo) Delete(id uint64) error {
 	query, args, err := r.psql.Delete("teachers").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()

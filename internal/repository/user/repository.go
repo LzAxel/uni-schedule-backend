@@ -21,14 +21,14 @@ func NewUserRepo(db *sqlx.DB) *UserRepo {
 	}
 }
 
-func (r *UserRepo) Create(user domain.UserCreate) (domain.ID, error) {
+func (r *UserRepo) Create(user domain.UserCreate) (uint64, error) {
 	query, args := r.psql.Insert("users").
 		Columns("username", "password_hash", "role", "created_at").
 		Values(user.Username, user.PasswordHash, user.Role, user.CreatedAt).
 		Suffix("RETURNING id").
 		MustSql()
 
-	var id domain.ID
+	var id uint64
 	err := r.db.QueryRow(query, args...).Scan(&id)
 	if err != nil {
 		if psql.IsPgErrorCode(err, pgerrcode.UniqueViolation) {
@@ -39,7 +39,7 @@ func (r *UserRepo) Create(user domain.UserCreate) (domain.ID, error) {
 	return id, nil
 }
 
-func (r *UserRepo) GetByID(id domain.ID) (domain.User, error) {
+func (r *UserRepo) GetByID(id uint64) (domain.User, error) {
 	query, args := r.psql.Select("*").From("users").
 		Where(squirrel.Eq{"id": id}).
 		MustSql()
@@ -68,7 +68,7 @@ func (r *UserRepo) GetByUsername(username string) (domain.User, error) {
 	return user, nil
 }
 
-func (r *UserRepo) Update(id domain.ID, update domain.UserUpdateDTO) error {
+func (r *UserRepo) Update(id uint64, update domain.UserUpdateDTO) error {
 	q := r.psql.Update("users").Where(squirrel.Eq{"id": id})
 
 	if update.Role != nil {
@@ -90,7 +90,7 @@ func (r *UserRepo) Update(id domain.ID, update domain.UserUpdateDTO) error {
 	return err
 }
 
-func (r *UserRepo) Delete(id domain.ID) error {
+func (r *UserRepo) Delete(id uint64) error {
 	query, args := r.psql.Delete("users").
 		Where(squirrel.Eq{"id": id}).
 		MustSql()

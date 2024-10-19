@@ -15,7 +15,3 @@ func VerifyPassword(password, hash, salt string) bool {
 	log.Error(err)
 	return err == nil
 }
-
-func GenerateSalt() string {
-	return "salt"
-}

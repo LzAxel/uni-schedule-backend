@@ -7,7 +7,7 @@ import (
 	"uni-schedule-backend/internal/domain"
 )
 
-func (s *AuthService) generateTokenPair(userID domain.ID) (domain.TokenPair, error) {
+func (s *AuthService) generateTokenPair(userID uint64) (domain.TokenPair, error) {
 	accessToken, err := s.jwtManager.GenerateAccessToken(userID)
 	if err != nil {
 		return domain.TokenPair{}, fmt.Errorf("AuthService.generateTokenPair.GenerateAccessToken: %w", err)
@@ -20,7 +20,7 @@ func (s *AuthService) generateTokenPair(userID domain.ID) (domain.TokenPair, err
 	return domain.NewTokenPair(accessToken, refreshToken), nil
 }
 
-func (s *AuthService) generateAndStoreTokenPair(userID domain.ID) (domain.TokenPair, error) {
+func (s *AuthService) generateAndStoreTokenPair(userID uint64) (domain.TokenPair, error) {
 	tokenPair, err := s.generateTokenPair(userID)
 	if err != nil {
 		return domain.TokenPair{}, err

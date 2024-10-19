@@ -5,7 +5,7 @@ app:
 
 jwt:
   issuer: uni-schedule-dev
-  accessTokenLifetime: 10m
+  accessTokenLifetime: 24h
   refreshTokenLifetime: 48h
   accessTokenSecret: accessTokenSecret
   refreshTokenSecret: refreshTokenSecret

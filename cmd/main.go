@@ -2,27 +2,18 @@ package main
 
 import "uni-schedule-backend/internal/app"
 
+// @title Uni Schedule API
+// @version 0.1
+// @description This is an API for Uni Schedule App.
+// @host localhost:3000
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+
 func main() {
-	/*
-				ENDPOINTS:
-					SCHEDULE:
-						- [GET] /schedule/id/:id
-						- [GET] /schedule/slug/:slug
-						- [PATCH] /schedule/:id
-					LECTURERS:
-						- [GET] /lecturer/all/:schedule_id
-						- [PATCH] /lecturer/:id
-						- [POST] /lecturer/:schedule_id
-					PAIRS:
-						- [POST] /pair
-						- [PATCH] /pair/:id
-						- [DELETE] /pair/:id
-		  				- [POST] /pair/item
-						- [POST] /pair/item
-
-
-	*/
-
 	appInstance := app.New()
 	appInstance.Run()
 }

@@ -35,7 +35,7 @@ func (r *TokenRepo) CreateOrUpdate(token domain.RefreshToken) error {
 	}
 	return nil
 }
-func (r *TokenRepo) GetByUserID(userID domain.ID) (domain.RefreshToken, error) {
+func (r *TokenRepo) GetByUserID(userID uint64) (domain.RefreshToken, error) {
 	query, args, err := r.psql.
 		Select("user_id", "updated_at", "token").
 		From("refresh_tokens").
@@ -50,7 +50,7 @@ func (r *TokenRepo) GetByUserID(userID domain.ID) (domain.RefreshToken, error) {
 
 	return token, err
 }
-func (r *TokenRepo) Delete(userID domain.ID) error {
+func (r *TokenRepo) Delete(userID uint64) error {
 	query, args, err := r.psql.
 		Delete("refresh_tokens").
 		Where(squirrel.Eq{"user_id": userID}).

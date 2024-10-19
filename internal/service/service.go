@@ -13,38 +13,38 @@ import (
 )
 
 type UserService interface {
-	Create(user domain.User) (domain.ID, error)
-	GetByID(id domain.ID) (domain.User, error)
+	Create(user domain.User) (uint64, error)
+	GetByID(id uint64) (domain.User, error)
 	GetByUsername(username string) (domain.User, error)
-	Update(id domain.ID, update domain.UserUpdateDTO) error
-	Delete(id domain.ID) error
+	Update(id uint64, update domain.UserUpdateDTO) error
+	Delete(id uint64) error
 }
 
 type TeacherService interface {
-	Create(teacher domain.Teacher) (domain.ID, error)
-	GetByID(id domain.ID) (domain.Teacher, error)
+	Create(teacher domain.TeacherCreate) (uint64, error)
+	GetByID(id uint64) (domain.Teacher, error)
 	GetAll() ([]domain.Teacher, error)
-	Update(id domain.ID, update domain.TeacherUpdate) error
-	Delete(id domain.ID) error
+	Update(id uint64, update domain.TeacherUpdate) error
+	Delete(id uint64) error
 }
 
 type LessonService interface {
-	Create(lesson domain.Lesson) (domain.ID, error)
-	GetByID(id domain.ID) (domain.Lesson, error)
-	Update(id domain.ID, update domain.LessonUpdate) error
-	Delete(id domain.ID) error
+	Create(lesson domain.LessonCreate) (uint64, error)
+	GetByID(id uint64) (domain.Lesson, error)
+	Update(id uint64, update domain.LessonUpdate) error
+	Delete(id uint64) error
 }
 
 type ScheduleService interface {
-	CreateSchedule(schedule domain.Schedule) (domain.ID, error)
-	GetScheduleByID(id domain.ID) (domain.Schedule, error)
-	UpdateSchedule(id domain.ID, update domain.ScheduleUpdate) error
-	DeleteSchedule(id domain.ID) error
+	CreateSchedule(schedule domain.ScheduleCreate) (uint64, error)
+	GetScheduleBySlug(slug string) (domain.ScheduleView, error)
+	UpdateSchedule(id uint64, update domain.ScheduleUpdate) error
+	DeleteSchedule(id uint64) error
 
-	CreateSlot(slot domain.ScheduleSlot) (domain.ID, error)
-	GetSlotByID(id domain.ID) (domain.ScheduleSlot, error)
-	UpdateSlot(id domain.ID, update domain.ScheduleSlotUpdate) error
-	DeleteSlot(id domain.ID) error
+	CreateSlot(slot domain.ScheduleSlotCreate) (uint64, error)
+	GetSlotByID(id uint64) (domain.ScheduleSlot, error)
+	UpdateSlot(id uint64, update domain.ScheduleSlotUpdate) error
+	DeleteSlot(id uint64) error
 }
 
 type AuthService interface {
@@ -71,6 +71,6 @@ func NewService(repository *repository.Repository) *Service {
 		User:     userservice.NewUserService(repository.User),
 		Teacher:  teacherservice.NewTeacherService(repository.Teacher),
 		Lesson:   lessonservice.NewLessonService(repository.Lesson),
-		Schedule: scheduleservice.NewScheduleService(repository.Schedule, repository.ScheduleSlot),
+		Schedule: scheduleservice.NewScheduleService(repository.Schedule, repository.ScheduleSlot, repository.Lesson, repository.Teacher),
 	}
 }

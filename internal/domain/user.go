@@ -12,8 +12,21 @@ const (
 	RoleStudent
 )
 
+func (r Role) String() string {
+	switch r {
+	case RoleAdmin:
+		return "Admin"
+	case RoleScheduleEditor:
+		return "Editor"
+	case RoleStudent:
+		return "Student"
+	default:
+		return "Unknown"
+	}
+}
+
 type User struct {
-	ID           ID
+	ID           uint64
 	Username     string
 	PasswordHash string
 	Role         Role

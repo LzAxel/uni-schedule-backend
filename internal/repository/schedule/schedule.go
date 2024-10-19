@@ -18,7 +18,7 @@ func NewScheduleRepo(db *sqlx.DB) *ScheduleRepo {
 	}
 }
 
-func (r *ScheduleRepo) Create(schedule domain.Schedule) (domain.ID, error) {
+func (r *ScheduleRepo) Create(schedule domain.ScheduleCreate) (uint64, error) {
 	query, args, err := r.psql.Insert("schedules").
 		Columns("creator_id", "name", "slug").
 		Values(schedule.CreatorID, schedule.Name, schedule.Slug).
@@ -28,7 +28,7 @@ func (r *ScheduleRepo) Create(schedule domain.Schedule) (domain.ID, error) {
 		return 0, err
 	}
 
-	var id domain.ID
+	var id uint64
 	err = r.db.QueryRow(query, args...).Scan(&id)
 	if err != nil {
 		return 0, err
@@ -36,7 +36,23 @@ func (r *ScheduleRepo) Create(schedule domain.Schedule) (domain.ID, error) {
 	return id, nil
 }
 
-func (r *ScheduleRepo) GetByID(id domain.ID) (domain.Schedule, error) {
+func (r *ScheduleRepo) GetBySlug(slug string) (domain.Schedule, error) {
+	query, args, err := r.psql.Select("*").From("schedules").
+		Where(squirrel.Eq{"slug": slug}).
+		ToSql()
+	if err != nil {
+		return domain.Schedule{}, err
+	}
+
+	var schedule domain.Schedule
+	err = r.db.QueryRow(query, args...).Scan(&schedule.ID, &schedule.CreatorID, &schedule.Name, &schedule.Slug)
+	if err != nil {
+		return domain.Schedule{}, err
+	}
+	return schedule, nil
+}
+
+func (r *ScheduleRepo) GetByID(id uint64) (domain.Schedule, error) {
 	query, args, err := r.psql.Select("*").From("schedules").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()
@@ -52,7 +68,7 @@ func (r *ScheduleRepo) GetByID(id domain.ID) (domain.Schedule, error) {
 	return schedule, nil
 }
 
-func (r *ScheduleRepo) Update(id domain.ID, update domain.ScheduleUpdate) error {
+func (r *ScheduleRepo) Update(id uint64, update domain.ScheduleUpdate) error {
 	q := r.psql.Update("schedules").Where(squirrel.Eq{"id": id})
 
 	if update.CreatorID != nil {
@@ -74,7 +90,7 @@ func (r *ScheduleRepo) Update(id domain.ID, update domain.ScheduleUpdate) error 
 	return err
 }
 
-func (r *ScheduleRepo) Delete(id domain.ID) error {
+func (r *ScheduleRepo) Delete(id uint64) error {
 	query, args, err := r.psql.Delete("schedules").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()

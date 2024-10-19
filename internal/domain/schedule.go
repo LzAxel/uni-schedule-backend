@@ -1,43 +1,28 @@
 package domain
 
-import (
-	"time"
-)
+import "time"
 
 type Schedule struct {
-	ID        ID
-	CreatorID ID
+	ID        uint64 `db:"id"`
+	CreatorID uint64 `db:"creator_id"`
+	Name      string `db:"name"`
+	Slug      string `db:"slug"`
+}
+
+type ScheduleCreate struct {
 	Name      string
 	Slug      string
+	CreatorID uint64
 }
 
 type ScheduleUpdate struct {
 	Name      *string
 	Slug      *string
-	CreatorID *ID
-}
-
-type ScheduleSlot struct {
-	ID               ID
-	ScheduleID       ID
-	Weekday          time.Weekday
-	Number           uint
-	IsAlternating    bool
-	EvenWeekLessonID *ID
-	OddWeekLessonID  *ID
-}
-
-type ScheduleSlotUpdate struct {
-	ScheduleID       *ID
-	Weekday          *time.Weekday
-	Number           *uint
-	IsAlternating    *bool
-	EvenWeekLessonID *ID
-	OddWeekLessonID  *ID
+	CreatorID *uint64
 }
 
 type ScheduleView struct {
-	ID       ID                        `json:"id"`
+	ID       uint64                    `json:"id"`
 	Name     string                    `json:"name"`
 	Slug     string                    `json:"slug"`
 	Weekdays []ScheduleGroupedSlotView `json:"weekdays"`
@@ -49,7 +34,7 @@ type ScheduleGroupedSlotView struct {
 }
 
 type ScheduleSlotView struct {
-	ID             ID          `json:"id"`
+	ID             uint64      `json:"id"`
 	Number         uint        `json:"number"`
 	IsAlternating  bool        `json:"is_alternating"`
 	EvenWeekLesson *LessonView `json:"even_week_lesson"`

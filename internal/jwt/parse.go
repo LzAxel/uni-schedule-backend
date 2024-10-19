@@ -5,10 +5,9 @@ import (
 	"github.com/pkg/errors"
 	"strconv"
 	"time"
-	"uni-schedule-backend/internal/domain"
 )
 
-func (j *JWTManager) ParseAccessToken(token string) (domain.ID, error) {
+func (j *JWTManager) ParseAccessToken(token string) (uint64, error) {
 	claims, err := j.parseToken(token, j.accessTokenSecret)
 	if err != nil {
 		return 0, err
@@ -24,10 +23,10 @@ func (j *JWTManager) ParseAccessToken(token string) (domain.ID, error) {
 		return 0, errors.Wrapf(ErrInvalidToken, "failed to parse token claims: %v", err)
 	}
 
-	return domain.ID(id), nil
+	return uint64(id), nil
 }
 
-func (j *JWTManager) ParseRefreshToken(token string) (domain.ID, error) {
+func (j *JWTManager) ParseRefreshToken(token string) (uint64, error) {
 	claims, err := j.parseToken(token, j.refreshTokenSecret)
 	if err != nil {
 		return 0, err
@@ -43,7 +42,7 @@ func (j *JWTManager) ParseRefreshToken(token string) (domain.ID, error) {
 		return 0, errors.Wrapf(ErrInvalidToken, "failed to parse token claims: %v", err)
 	}
 
-	return domain.ID(id), nil
+	return uint64(id), nil
 }
 
 func (j *JWTManager) parseToken(token string, secret string) (*jwt.StandardClaims, error) {

@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "uni-schedule-backend/docs"
 	"uni-schedule-backend/internal/config"
+	"uni-schedule-backend/internal/domain"
 	"uni-schedule-backend/internal/service"
 )
 
@@ -46,10 +49,32 @@ func (c *Controller) initRoutes() {
 			auth.POST("/refresh", c.AuthRefresh)
 		}
 
-		user := v1api.Group("/user")
+		schedule := v1api.Group("/schedule")
 		{
-			user.POST("/test", c.UserTest, c.authMiddleware)
+			schedule.POST("", c.CreateSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			schedule.GET("/slug/:slug", c.GetScheduleBySlug)
+			schedule.PATCH("/:id", c.UpdateSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin, domain.RoleScheduleEditor))
+			schedule.DELETE("/:id", c.DeleteSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+
+			schedule.POST("/:schedule_id/slot", c.AddPairToSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			schedule.DELETE("/slot/:slot_id", c.DeleteSlotFromSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			schedule.PATCH("/slot/:slot_id", c.UpdateSlotInSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
 		}
+
+		teacher := v1api.Group("/teacher")
+		{
+			teacher.POST("", c.CreateTeacher, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			teacher.PATCH("/:id", c.UpdateTeacher, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			teacher.DELETE("/:id", c.DeleteTeacher, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+		}
+
+		lesson := v1api.Group("/lesson")
+		{
+			lesson.POST("", c.CreateLesson, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			lesson.PATCH("/:id", c.UpdateLesson, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			lesson.DELETE("/:id", c.DeleteLesson, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+		}
+		v1api.GET("/swagger/*", echoSwagger.WrapHandler)
 	}
 }
 

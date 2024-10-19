@@ -1,30 +1,45 @@
 package domain
 
-type LessonType string
+type LessonType uint64
 
 const (
-	LessonTypeLecture  LessonType = "lecture"
-	LessonTypePractice LessonType = "practice"
-	LessonTypeLab      LessonType = "lab"
+	LessonTypeLecture  LessonType = iota
+	LessonTypePractice LessonType = iota
+	LessonTypeLab      LessonType = iota
 )
 
 type Lesson struct {
-	ID         ID
+	ID         uint64     `db:"id"`
+	Name       string     `db:"name"`
+	Location   string     `db:"location"`
+	TeacherID  uint64     `db:"teacher_id"`
+	LessonType LessonType `db:"lesson_type"`
+}
+
+type LessonWithRelations struct {
+	ID         uint64
 	Name       string
 	Location   string
-	TeacherID  int
+	Teacher    Teacher
 	LessonType LessonType
 }
 
 type LessonUpdate struct {
 	Name       *string
 	Location   *string
-	TeacherID  *ID
+	TeacherID  *uint64
 	LessonType *LessonType
 }
 
+type LessonCreate struct {
+	Name       string
+	Location   string
+	TeacherID  uint64
+	LessonType LessonType
+}
+
 type LessonView struct {
-	ID         ID          `json:"id"`
+	ID         uint64      `json:"id"`
 	Name       string      `json:"name"`
 	Location   string      `json:"location"`
 	Teacher    TeacherView `json:"teacher"`
