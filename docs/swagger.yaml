@@ -1,0 +1,1046 @@
+basePath: /api/v1
+definitions:
+  domain.Class:
+    properties:
+      class_type:
+        $ref: '#/definitions/domain.ClassType'
+      id:
+        type: integer
+      schedule_id:
+        type: integer
+      subject_id:
+        type: integer
+      teacher_id:
+        type: integer
+    required:
+    - class_type
+    - id
+    - schedule_id
+    - subject_id
+    - teacher_id
+    type: object
+  domain.ClassType:
+    enum:
+    - lecture
+    - practice
+    - lab
+    - combined
+    type: string
+    x-enum-varnames:
+    - Lecture
+    - Practice
+    - Lab
+    - Combined
+  domain.ClassView:
+    properties:
+      class_type:
+        $ref: '#/definitions/domain.ClassType'
+      id:
+        type: integer
+      subject:
+        $ref: '#/definitions/domain.SubjectView'
+      teacher:
+        $ref: '#/definitions/domain.TeacherView'
+    required:
+    - class_type
+    - id
+    - subject
+    - teacher
+    type: object
+  domain.CreateClassDTO:
+    properties:
+      class_type:
+        $ref: '#/definitions/domain.ClassType'
+      schedule_id:
+        type: integer
+      subject_id:
+        type: integer
+      teacher_id:
+        type: integer
+    required:
+    - class_type
+    - schedule_id
+    - subject_id
+    - teacher_id
+    type: object
+  domain.CreateSubjectDTO:
+    properties:
+      name:
+        type: string
+      schedule_id:
+        type: integer
+    required:
+    - name
+    - schedule_id
+    type: object
+  domain.Day:
+    enum:
+    - monday
+    - tuesday
+    - wednesday
+    - thursday
+    - friday
+    - saturday
+    type: string
+    x-enum-varnames:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+  domain.Pagination:
+    properties:
+      limit:
+        type: integer
+      offest:
+        type: integer
+      pages:
+        type: integer
+      total:
+        type: integer
+    required:
+    - limit
+    - offest
+    - pages
+    - total
+    type: object
+  domain.Schedule:
+    properties:
+      id:
+        type: integer
+      slug:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - id
+    - slug
+    - user_id
+    type: object
+  domain.ScheduleEntryView:
+    properties:
+      class_number:
+        type: integer
+      day:
+        $ref: '#/definitions/domain.Day'
+      even:
+        $ref: '#/definitions/domain.ClassView'
+      id:
+        type: integer
+      is_static:
+        type: boolean
+      odd:
+        $ref: '#/definitions/domain.ClassView'
+    required:
+    - class_number
+    - day
+    - even
+    - id
+    - is_static
+    - odd
+    type: object
+  domain.ScheduleView:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/domain.ScheduleEntryView'
+        type: array
+      id:
+        type: integer
+      slug:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - entries
+    - id
+    - slug
+    - user_id
+    type: object
+  domain.Subject:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      schedule_id:
+        type: integer
+    required:
+    - id
+    - name
+    - schedule_id
+    type: object
+  domain.SubjectView:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  domain.Teacher:
+    properties:
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      schedule_id:
+        type: integer
+      surname:
+        type: string
+    required:
+    - first_name
+    - id
+    - last_name
+    - schedule_id
+    - surname
+    type: object
+  domain.TeacherCreateDTO:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      schedule_id:
+        type: integer
+      surname:
+        type: string
+    required:
+    - first_name
+    - last_name
+    - schedule_id
+    - surname
+    type: object
+  domain.TeacherUpdateDTO:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      surname:
+        type: string
+    required:
+    - first_name
+    - last_name
+    - surname
+    type: object
+  domain.TeacherView:
+    properties:
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      surname:
+        type: string
+    required:
+    - first_name
+    - id
+    - last_name
+    - surname
+    type: object
+  domain.UpdateClassDTO:
+    properties:
+      class_type:
+        $ref: '#/definitions/domain.ClassType'
+      subject_id:
+        type: integer
+      teacher_id:
+        type: integer
+    required:
+    - class_type
+    - subject_id
+    - teacher_id
+    type: object
+  domain.UpdateSubjectDTO:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  handler.AuthResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - access_token
+    - refresh_token
+    type: object
+  handler.CreateScheduleRequest:
+    properties:
+      slug:
+        type: string
+    required:
+    - slug
+    type: object
+  handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    required:
+    - error
+    type: object
+  handler.GetMySchedulesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Schedule'
+        type: array
+      pagination:
+        $ref: '#/definitions/domain.Pagination'
+    required:
+    - data
+    - pagination
+    type: object
+  handler.GetScheduleClassesResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.ClassView'
+        type: array
+      pagination:
+        $ref: '#/definitions/domain.Pagination'
+    required:
+    - data
+    - pagination
+    type: object
+  handler.GetSubjectsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Subject'
+        type: array
+      pagination:
+        $ref: '#/definitions/domain.Pagination'
+    required:
+    - data
+    - pagination
+    type: object
+  handler.GetTeahersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Teacher'
+        type: array
+      pagination:
+        $ref: '#/definitions/domain.Pagination'
+    required:
+    - data
+    - pagination
+    type: object
+  handler.IDResponse:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  handler.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  handler.RegisterRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  handler.UpdateScheduleRequest:
+    properties:
+      slug:
+        type: string
+    required:
+    - slug
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: This is an API for Uni Schedule App.
+  title: Uni Schedule API
+  version: "0.1"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Get access and refresh token pair by username and password
+      operationId: auth-login
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Login
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Generate a new access and refresh token pair using the refresh
+        token
+      operationId: auth-refresh
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Refresh Tokens
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create an account and get access and refresh token pair
+      operationId: auth-register
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Register
+      tags:
+      - Auth
+  /classes:
+    post:
+      description: Create Class
+      operationId: classes-create
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateClassDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create Class
+      tags:
+      - Class
+  /classes/{id}:
+    delete:
+      description: Delete Class
+      operationId: classes-delete
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete Class
+      tags:
+      - Class
+    get:
+      description: Get Class  By ID
+      operationId: classes-get-by-id
+      parameters:
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Class'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Class By ID
+      tags:
+      - Class
+    patch:
+      description: Update Class
+      operationId: classes-update
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateClassDTO'
+      - description: Class ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update Class
+      tags:
+      - Class
+  /schedules:
+    post:
+      consumes:
+      - application/json
+      description: Create a new schedule
+      operationId: schedule-create
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create Schedule
+      tags:
+      - Schedule
+  /schedules/{id}:
+    delete:
+      description: Delete schedule
+      operationId: schedule-delete
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete Schedule
+      tags:
+      - Schedule
+    patch:
+      consumes:
+      - application/json
+      description: Update schedule
+      operationId: schedule-update
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateScheduleRequest'
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update Schedule
+      tags:
+      - Schedule
+  /schedules/{schedule_id}/classes:
+    get:
+      description: Get Schedule's Classes
+      operationId: classes-get-schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.GetScheduleClassesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Schedule's Classes
+      tags:
+      - Class
+  /schedules/{schedule_id}/subjects:
+    get:
+      description: Get Schedule's Subjects
+      operationId: subjects-get-all-schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.GetSubjectsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Schedule's Subjects
+      tags:
+      - Subjects
+  /schedules/{schedule_id}/teachers:
+    get:
+      description: Get Schedule's Teachers
+      operationId: teacher-get-all
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.GetTeahersResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Schedule's Teachers
+      tags:
+      - Teacher
+  /schedules/my:
+    get:
+      description: Get Current User Schedules
+      operationId: schedule-get-my
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.GetMySchedulesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get Current User Schedules
+      tags:
+      - Schedule
+  /schedules/slug/{slug}:
+    get:
+      description: Get schedule using slug
+      operationId: schedule-get-slug
+      parameters:
+      - description: Schedule Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ScheduleView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get Schedule By Slug
+      tags:
+      - Schedule
+  /subjects:
+    post:
+      description: Create Subject
+      operationId: subjects-create
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateSubjectDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create Subject
+      tags:
+      - Subjects
+  /subjects/{id}:
+    delete:
+      description: Delete Subject
+      operationId: subjects-delete
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete Subject
+      tags:
+      - Subjects
+    get:
+      description: Get Subject by ID
+      operationId: subjects-get-by-id
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Subject'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Subject by ID
+      tags:
+      - Subjects
+    patch:
+      description: Update Subject
+      operationId: subjects-update
+      parameters:
+      - description: Subject ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateSubjectDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update Subject
+      tags:
+      - Subjects
+  /teachers:
+    post:
+      consumes:
+      - application/json
+      description: Create a new teacher
+      operationId: teacher-create
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TeacherCreateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create Teacher
+      tags:
+      - Teacher
+  /teachers/{id}:
+    delete:
+      description: Delete teacher
+      operationId: teacher-delete
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete Teacher
+      tags:
+      - Teacher
+    get:
+      description: Get Schedule's Teacher
+      operationId: teacher-get-id
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Teacher'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Schedule's Teacher
+      tags:
+      - Teacher
+    patch:
+      description: Update teacher
+      operationId: teacher-update
+      parameters:
+      - description: Teacher ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TeacherUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update Teacher
+      tags:
+      - Teacher
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

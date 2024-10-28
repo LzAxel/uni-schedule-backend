@@ -5,8 +5,10 @@ import (
 	_ "github.com/lib/pq"
 	"uni-schedule-backend/internal/repository"
 	tokenrepo "uni-schedule-backend/internal/repository/auth"
-	lessonrepo "uni-schedule-backend/internal/repository/lesson"
+	classrepo "uni-schedule-backend/internal/repository/class"
+	entryrepo "uni-schedule-backend/internal/repository/entry"
 	"uni-schedule-backend/internal/repository/schedule"
+	subjectrepo "uni-schedule-backend/internal/repository/subject"
 	teacherrepo "uni-schedule-backend/internal/repository/teacher"
 	userrepo "uni-schedule-backend/internal/repository/user"
 )
@@ -25,11 +27,12 @@ func NewDBConnection(dsn string) (*sqlx.DB, error) {
 
 func NewPostgresRepository(db *sqlx.DB) *repository.Repository {
 	return &repository.Repository{
-		Token:        tokenrepo.NewTokenRepo(db),
-		User:         userrepo.NewUserRepo(db),
-		Teacher:      teacherrepo.NewTeacherRepo(db),
-		Lesson:       lessonrepo.NewLessonRepo(db),
-		Schedule:     schedule.NewScheduleRepo(db),
-		ScheduleSlot: schedule.NewScheduleSlotRepo(db),
+		Token:    tokenrepo.NewTokenRepo(db),
+		User:     userrepo.NewUserRepo(db),
+		Teacher:  teacherrepo.NewTeacherRepo(db),
+		Subject:  subjectrepo.NewSubjectRepo(db),
+		Schedule: schedule.NewScheduleRepo(db),
+		Entry:    entryrepo.NewEntryRepo(db),
+		Class:    classrepo.NewClassRepo(db),
 	}
 }

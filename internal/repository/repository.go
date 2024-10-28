@@ -13,34 +13,19 @@ type UserRepository interface {
 }
 
 type TeacherRepository interface {
-	Create(teacher domain.TeacherCreate) (uint64, error)
+	Create(teacher domain.TeacherCreateDTO) (uint64, error)
 	GetByID(id uint64) (domain.Teacher, error)
-	GetAll() ([]domain.Teacher, error)
-	Update(id uint64, update domain.TeacherUpdate) error
-	Delete(id uint64) error
-}
-
-type LessonRepository interface {
-	Create(lesson domain.LessonCreate) (uint64, error)
-	GetByID(id uint64) (domain.Lesson, error)
-	GetWithRelationsByID(id uint64) (domain.LessonView, error)
-	Update(id uint64, update domain.LessonUpdate) error
+	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.Teacher, uint64, error)
+	Update(id uint64, update domain.TeacherUpdateDTO) error
 	Delete(id uint64) error
 }
 
 type ScheduleRepository interface {
-	Create(schedule domain.ScheduleCreate) (uint64, error)
+	Create(schedule domain.CreateScheduleDTO) (uint64, error)
 	GetByID(id uint64) (domain.Schedule, error)
 	GetBySlug(slug string) (domain.Schedule, error)
-	Update(id uint64, update domain.ScheduleUpdate) error
-	Delete(id uint64) error
-}
-
-type ScheduleSlotRepository interface {
-	Create(slot domain.ScheduleSlotCreate) (uint64, error)
-	GetByID(id uint64) (domain.ScheduleSlot, error)
-	GetAllSlotsByScheduleID(scheduleID uint64) ([]domain.ScheduleSlot, error)
-	Update(id uint64, update domain.ScheduleSlotUpdate) error
+	GetAll(limit uint64, offset uint64, filters domain.ScheduleGetAllFilters) ([]domain.Schedule, uint64, error)
+	Update(id uint64, update domain.UpdateScheduleDTO) error
 	Delete(id uint64) error
 }
 
@@ -50,11 +35,37 @@ type TokenRepository interface {
 	Delete(userID uint64) error
 }
 
+type SubjectRepository interface {
+	Create(subject domain.CreateSubjectDTO) (uint64, error)
+	GetByID(id uint64) (domain.Subject, error)
+	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.Subject, uint64, error)
+	Update(id uint64, update domain.UpdateSubjectDTO) error
+	Delete(id uint64) error
+}
+
+type EntryRepository interface {
+	Create(entry domain.CreateScheduleEntryDTO) (uint64, error)
+	GetByID(id uint64) (domain.ScheduleEntry, error)
+	GetEntriesView(scheduleID uint64) ([]domain.ScheduleEntryView, error)
+	Update(id uint64, update domain.UpdateScheduleEntryDTO) error
+	Delete(id uint64) error
+}
+
+type ClassRepository interface {
+	Create(class domain.CreateClassDTO) (uint64, error)
+	GetByID(id uint64) (domain.Class, error)
+	GetAllViews(scheduleID uint64, limit uint64, offset uint64) ([]domain.ClassView, uint64, error)
+	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.Class, uint64, error)
+	Update(id uint64, update domain.UpdateClassDTO) error
+	Delete(id uint64) error
+}
+
 type Repository struct {
-	Token        TokenRepository
-	User         UserRepository
-	Teacher      TeacherRepository
-	Lesson       LessonRepository
-	Schedule     ScheduleRepository
-	ScheduleSlot ScheduleSlotRepository
+	Token    TokenRepository
+	User     UserRepository
+	Subject  SubjectRepository
+	Teacher  TeacherRepository
+	Class    ClassRepository
+	Schedule ScheduleRepository
+	Entry    EntryRepository
 }

@@ -19,7 +19,10 @@ var (
 	ErrUserNotFound         = New(ErrorTypeNotFound, "User not found", nil)
 	ErrUsernameAlreadyTaken = New(ErrorTypeConflict, "Username already taken", nil)
 
-	ErrInvalidSlug = New(ErrorTypeBadRequest, "Invalid slug", nil)
+	ErrSlugAlreadyInUse = New(ErrorTypeConflict, "Slug already in use", nil)
+	ErrInvalidSlug      = New(ErrorTypeBadRequest, "Invalid slug", nil)
+
+	ErrDontHavePermission = New(ErrorTypeForbidden, "You don't have permission", nil)
 
 	ErrScheduleNotFound     = New(ErrorTypeNotFound, "Schedule not found", nil)
 	ErrEmptyShortName       = New(ErrorTypeBadRequest, "Short name is empty", nil)
@@ -36,6 +39,6 @@ func NewErrUserShoutHaveRole(role ...domain.Role) error {
 	return New(ErrorTypeForbidden, fmt.Sprintf("User should have one of roles: %s", strings.Join(formattedRoles, ", ")), nil)
 }
 
-func NewErrInvalidIDParam(name string) error {
-	return New(ErrorTypeBadRequest, fmt.Sprintf("Invalid uint path param: %s", name), nil)
+func NewErrInvalidQueryParam(name string) error {
+	return New(ErrorTypeBadRequest, fmt.Sprintf("Invalid query param: %s", name), nil)
 }

@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"github.com/labstack/echo/v4"
 	"strconv"
 	"uni-schedule-backend/internal/apperror"
+
+	"github.com/labstack/echo/v4"
 )
 
 type ErrorResponse struct {
@@ -32,7 +33,28 @@ func parseIDParam(ctx echo.Context, param string) (uint64, error) {
 	idStr := ctx.Param(param)
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
-		return 0, apperror.NewErrInvalidIDParam(param)
+		return 0, apperror.NewErrInvalidQueryParam(param)
 	}
 	return id, nil
+}
+
+func getPagination(ctx echo.Context) (limit uint64, offset uint64, err error) {
+	limit = 25
+	offset = 0
+
+	limitStr := ctx.QueryParam("limit")
+	if limitStr != "" {
+		limit, err = strconv.ParseUint(limitStr, 10, 64)
+		if err != nil {
+			return 0, 0, apperror.NewErrInvalidQueryParam("limit")
+		}
+	}
+	offsetStr := ctx.QueryParam("offset")
+	if offsetStr != "" {
+		offset, err = strconv.ParseUint(offsetStr, 10, 64)
+		if err != nil {
+			return 0, 0, apperror.NewErrInvalidQueryParam("offset")
+		}
+	}
+	return limit, offset, nil
 }

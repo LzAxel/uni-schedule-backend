@@ -26,20 +26,23 @@ Content-Type: application/json
 }
 
 ### Schedule Create schedule
-POST {{base}}/api/v1/schedule
+POST {{base}}/api/v1/schedules
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "New Test Schedule",
-  "slug": "test",
-  "creator_id": 10
+  "slug": "test-schedule"
 }
 
+
 ### Schedule Get schedule by slug
-GET {{base}}/api/v1/schedule/slug/test
+GET {{base}}/api/v1/schedules/slug/test-schedule
 Authorization: Bearer {{token}}
 
+
+### Schedule Get schedule by id
+GET {{base}}/api/v1/schedule/slug/test
+Authorization: Bearer {{token}}
 
 ### Schedule Create teacher
 POST {{base}}/api/v1/teacher
@@ -73,4 +76,68 @@ Authorization: Bearer {{token}}
   "is_alternating": true,
   "even_week_lesson_id": 1,
   "odd_week_lesson_id": 3
+}
+
+### Teacher Add
+POST {{base}}/api/v1/teachers
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "first_name": "Дмитрий",
+  "last_name": "Саратов",
+  "surname": "Михаилович",
+  "schedule_id": 1
+}
+
+### Teacher Get All
+GET {{base}}/api/v1/schedules/1/teachers
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+### Subject Add
+POST {{base}}/api/v1/subjects
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Алгебра",
+  "schedule_id": 1
+}
+
+### Subject Get All
+GET {{base}}/api/v1/schedules/1/subjects
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+### Class Add
+POST {{base}}/api/v1/classes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "schedule_id": 1,
+  "subject_id": 2,
+  "teacher_id": 3,
+  "class_type": "lab"
+}
+
+### Class Get All
+GET {{base}}/api/v1/schedules/1/classes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Entry Add
+POST {{base}}/api/v1/schedules/test-schedule/entries
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "day": "tuesday",
+  "schedule_id": 1,
+  "class_number": 4,
+  "even_class_id": 7,
+  "is_static": false
 }

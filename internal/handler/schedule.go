@@ -1,17 +1,15 @@
 package handler
 
 import (
-	"github.com/labstack/echo/v4"
 	"net/http"
-	"time"
 	"uni-schedule-backend/internal/apperror"
 	"uni-schedule-backend/internal/domain"
+
+	"github.com/labstack/echo/v4"
 )
 
 type CreateScheduleRequest struct {
-	Name      string `json:"name"`
-	Slug      string `json:"slug"`
-	CreatorID uint64 `json:"creator_id"`
+	Slug string `json:"slug"`
 }
 
 // CreateSchedule
@@ -25,140 +23,27 @@ type CreateScheduleRequest struct {
 // @Success 200 {object} IDResponse
 // @Failure 400 {object} ErrorResponse
 // @Security Bearer
-// @Router /schedule [post]
+// @Router /schedules [post]
 func (c *Controller) CreateSchedule(ctx echo.Context) error {
 	var req CreateScheduleRequest
 	err := bindStruct(ctx, &req)
 	if err != nil {
 		return c.handleAppError(ctx, err)
 	}
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
 
-	id, err := c.Service.Schedule.CreateSchedule(domain.ScheduleCreate{
-		Name:      req.Name,
-		Slug:      req.Slug,
-		CreatorID: req.CreatorID,
+	id, err := c.Service.Schedule.Create(domain.CreateScheduleDTO{
+		UserID: user.ID,
+		Slug:   req.Slug,
 	})
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
 
 	return ctx.JSON(http.StatusCreated, NewIDResponse(id))
-}
-
-type AddSlotToScheduleRequest struct {
-	Weekday          time.Weekday `json:"weekday"`
-	Number           uint         `json:"number"`
-	IsAlternating    bool         `json:"is_alternating"`
-	EvenWeekLessonID uint64       `json:"even_week_lesson_id"`
-	OddWeekLessonID  uint64       `json:"odd_week_lesson_id"`
-}
-
-// AddPairToSchedule
-// @Summary Add Pair Slot To Schedule
-// @Description Add a new pair slot to schedule
-// @Tags Schedule
-// @ID schedule-add-pair
-// @Accept  json
-// @Produce  json
-// @Param schedule_id path uint true "Schedule ID"
-// @Param data body AddSlotToScheduleRequest true "Data"
-// @Success 200 {object} IDResponse
-// @Failure 400 {object} ErrorResponse
-// @Security Bearer
-// @Router /schedule/{schedule_id}/slot [post]
-func (c *Controller) AddPairToSchedule(ctx echo.Context) error {
-	var req AddSlotToScheduleRequest
-
-	scheduleID, err := parseIDParam(ctx, "schedule_id")
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	err = bindStruct(ctx, &req)
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	id, err := c.Service.Schedule.CreateSlot(domain.ScheduleSlotCreate{
-		ScheduleID:       scheduleID,
-		Weekday:          req.Weekday,
-		Number:           req.Number,
-		IsAlternating:    req.IsAlternating,
-		EvenWeekLessonID: req.EvenWeekLessonID,
-		OddWeekLessonID:  req.OddWeekLessonID,
-	})
-
-	return ctx.JSON(http.StatusCreated, NewIDResponse(id))
-}
-
-// DeleteSlotFromSchedule
-// @Summary Delete Pair Slot From Schedule
-// @Description Delete pair slot from schedule
-// @Tags Schedule
-// @ID schedule-delete-pair
-// @Produce  json
-// @Param slot_id path uint true "Slot ID"
-// @Success 200 {object} IDResponse
-// @Failure 400 {object} ErrorResponse
-// @Security Bearer
-// @Router /schedule/slot/{slot_id} [delete]
-func (c *Controller) DeleteSlotFromSchedule(ctx echo.Context) error {
-	slotID, err := parseIDParam(ctx, "slot_id")
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	err = c.Service.Schedule.DeleteSlot(slotID)
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	return ctx.JSON(http.StatusOK, NewIDResponse(slotID))
-}
-
-type UpdateSlotInScheduleRequest struct {
-	Weekday          *time.Weekday `json:"weekday"`
-	Number           *uint         `json:"number"`
-	IsAlternating    *bool         `json:"is_alternating"`
-	EvenWeekLessonID *uint64       `json:"even_week_lesson_id"`
-	OddWeekLessonID  *uint64       `json:"odd_week_lesson_id"`
-}
-
-// UpdateSlotInSchedule
-// @Summary Update Pair Slot In Schedule
-// @Description Update pair slot in schedule. To clear weekLessonID - set it to 0.
-// @Tags Schedule
-// @ID schedule-update-pair
-// @Accept  json
-// @Produce  json
-// @Param slot_id path uint true "Slot ID"
-// @Param data body UpdateSlotInScheduleRequest true "Data"
-// @Success 200 {object} IDResponse
-// @Failure 400 {object} ErrorResponse
-// @Security Bearer
-// @Router /schedule/slot/{slot_id} [patch]
-func (c *Controller) UpdateSlotInSchedule(ctx echo.Context) error {
-	slotID, err := parseIDParam(ctx, "slot_id")
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	var req UpdateSlotInScheduleRequest
-
-	err = bindStruct(ctx, &req)
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	err = c.Service.Schedule.UpdateSlot(slotID, domain.ScheduleSlotUpdate{
-		Weekday:          req.Weekday,
-		Number:           req.Number,
-		IsAlternating:    req.IsAlternating,
-		EvenWeekLessonID: req.EvenWeekLessonID,
-		OddWeekLessonID:  req.OddWeekLessonID,
-	})
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	return ctx.JSON(http.StatusOK, NewIDResponse(slotID))
 }
 
 // GetScheduleBySlug
@@ -170,7 +55,7 @@ func (c *Controller) UpdateSlotInSchedule(ctx echo.Context) error {
 // @Param slug path string true "Schedule Slug"
 // @Success 200 {object} domain.ScheduleView
 // @Failure 400 {object} ErrorResponse
-// @Router /schedule/slug/{slug} [get]
+// @Router /schedules/slug/{slug} [get]
 func (c *Controller) GetScheduleBySlug(ctx echo.Context) error {
 	slug := ctx.Param("slug")
 
@@ -178,7 +63,7 @@ func (c *Controller) GetScheduleBySlug(ctx echo.Context) error {
 		return c.handleAppError(ctx, apperror.ErrInvalidSlug)
 	}
 
-	schedule, err := c.Service.Schedule.GetScheduleBySlug(slug)
+	schedule, err := c.Service.Schedule.GetBySlug(slug)
 	if err != nil {
 		return c.handleAppError(ctx, err)
 	}
@@ -186,10 +71,46 @@ func (c *Controller) GetScheduleBySlug(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, schedule)
 }
 
+type GetMySchedulesResponse struct {
+	Data       []domain.Schedule `json:"data"`
+	Pagination domain.Pagination `json:"pagination"`
+}
+
+// GetMySchedules
+// @Summary Get Current User Schedules
+// @Description Get Current User Schedules
+// @Tags Schedule
+// @ID schedule-get-my
+// @Produce  json
+// @Param limit query uint false "Limit"
+// @Param offset query uint false "Offset"
+// @Success 200 {object} GetMySchedulesResponse
+// @Failure 400 {object} ErrorResponse
+// @Router /schedules/my [get]
+func (c *Controller) GetMySchedules(ctx echo.Context) error {
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
+
+	limit, offset, err := getPagination(ctx)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
+
+	schedules, pagination, err := c.Service.Schedule.GetMy(user.ID, limit, offset)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
+
+	return ctx.JSON(http.StatusOK, GetMySchedulesResponse{
+		Data:       schedules,
+		Pagination: pagination,
+	})
+}
+
 type UpdateScheduleRequest struct {
-	Name      *string `json:"name"`
-	Slug      *string `json:"slug"`
-	CreatorID *uint64 `json:"creator_id"`
+	Slug *string `json:"slug"`
 }
 
 // UpdateSchedule
@@ -199,27 +120,31 @@ type UpdateScheduleRequest struct {
 // @ID schedule-update
 // @Accept  json
 // @Produce  json
+// @Param data body UpdateScheduleRequest true "Data"
 // @Param id path uint true "Schedule ID"
 // @Success 200 {object} IDResponse
 // @Failure 400 {object} ErrorResponse
 // @Security Bearer
-// @Router /schedule/{id} [patch]
+// @Router /schedules/{id} [patch]
 func (c *Controller) UpdateSchedule(ctx echo.Context) error {
+	var req UpdateScheduleRequest
+	err := bindStruct(ctx, &req)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
+
 	id, err := parseIDParam(ctx, "id")
 	if err != nil {
 		return c.handleAppError(ctx, err)
 	}
 
-	var req UpdateScheduleRequest
-	err = bindStruct(ctx, &req)
+	user, err := getUserFromContext(ctx)
 	if err != nil {
 		return c.handleAppError(ctx, err)
 	}
 
-	err = c.Service.Schedule.UpdateSchedule(id, domain.ScheduleUpdate{
-		Name:      req.Name,
-		Slug:      req.Slug,
-		CreatorID: req.CreatorID,
+	err = c.Service.Schedule.Update(user.ID, id, domain.UpdateScheduleDTO{
+		Slug: req.Slug,
 	})
 	if err != nil {
 		return c.handleAppError(ctx, err)
@@ -238,14 +163,19 @@ func (c *Controller) UpdateSchedule(ctx echo.Context) error {
 // @Success 200 {object} IDResponse
 // @Failure 400 {object} ErrorResponse
 // @Security Bearer
-// @Router /schedule/{id} [delete]
+// @Router /schedules/{id} [delete]
 func (c *Controller) DeleteSchedule(ctx echo.Context) error {
 	id, err := parseIDParam(ctx, "id")
 	if err != nil {
 		return c.handleAppError(ctx, err)
 	}
 
-	err = c.Service.Schedule.DeleteSchedule(id)
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
+
+	err = c.Service.Schedule.Delete(user.ID, id)
 	if err != nil {
 		return c.handleAppError(ctx, err)
 	}

@@ -1,42 +1,36 @@
 package domain
 
-import "time"
-
 type Schedule struct {
-	ID        uint64 `db:"id"`
-	CreatorID uint64 `db:"creator_id"`
-	Name      string `db:"name"`
-	Slug      string `db:"slug"`
+	ID     uint64 `json:"id" db:"id"`
+	UserID uint64 `json:"user_id" db:"user_id"`
+	Slug   string `json:"slug" db:"slug"`
 }
 
-type ScheduleCreate struct {
-	Name      string
-	Slug      string
-	CreatorID uint64
+type CreateScheduleDTO struct {
+	UserID uint64 `json:"user_id" binding:"required"`
+	Slug   string `json:"slug" binding:"required"`
 }
 
-type ScheduleUpdate struct {
-	Name      *string
-	Slug      *string
-	CreatorID *uint64
+type UpdateScheduleDTO struct {
+	Slug *string `json:"slug,omitempty"`
 }
 
 type ScheduleView struct {
-	ID       uint64                    `json:"id"`
-	Name     string                    `json:"name"`
-	Slug     string                    `json:"slug"`
-	Weekdays []ScheduleGroupedSlotView `json:"weekdays"`
+	ID      uint64              `json:"id"`
+	UserID  uint64              `json:"user_id"`
+	Slug    string              `json:"slug"`
+	Entries []ScheduleEntryView `json:"entries"`
 }
 
-type ScheduleGroupedSlotView struct {
-	Day   time.Weekday       `json:"day"`
-	Slots []ScheduleSlotView `json:"slots"`
+func (s Schedule) ToView(entries []ScheduleEntryView) ScheduleView {
+	return ScheduleView{
+		ID:      s.ID,
+		UserID:  s.UserID,
+		Slug:    s.Slug,
+		Entries: entries,
+	}
 }
 
-type ScheduleSlotView struct {
-	ID             uint64      `json:"id"`
-	Number         uint        `json:"number"`
-	IsAlternating  bool        `json:"is_alternating"`
-	EvenWeekLesson *LessonView `json:"even_week_lesson"`
-	OddWeekLesson  *LessonView `json:"odd_week_lesson"`
+type ScheduleGetAllFilters struct {
+	UserID *uint64
 }

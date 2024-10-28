@@ -2,6 +2,7 @@ package user
 
 import (
 	"time"
+	"uni-schedule-backend/internal/apperror"
 	"uni-schedule-backend/internal/domain"
 	"uni-schedule-backend/internal/repository"
 )
@@ -30,7 +31,15 @@ func (s *UserService) GetByID(id uint64) (domain.User, error) {
 func (s *UserService) GetByUsername(username string) (domain.User, error) {
 	return s.userRepo.GetByUsername(username)
 }
-func (s *UserService) Update(id uint64, update domain.UserUpdateDTO) error {
+func (s *UserService) Update(userID uint64, id uint64, update domain.UserUpdateDTO) error {
+	user, err := s.userRepo.GetByID(userID)
+	if err != nil {
+		return err
+	}
+	if user.ID != userID {
+		return apperror.ErrDontHavePermission
+	}
+
 	return s.userRepo.Update(id, update)
 }
 func (s *UserService) Delete(id uint64) error {

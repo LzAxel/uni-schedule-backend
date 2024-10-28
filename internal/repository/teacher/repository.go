@@ -1,9 +1,13 @@
 package teacher
 
 import (
+	"database/sql"
+	"errors"
+	"uni-schedule-backend/internal/apperror"
+	"uni-schedule-backend/internal/domain"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
-	"uni-schedule-backend/internal/domain"
 )
 
 type TeacherRepo struct {
@@ -18,71 +22,99 @@ func NewTeacherRepo(db *sqlx.DB) *TeacherRepo {
 	}
 }
 
-func (r *TeacherRepo) Create(teacher domain.TeacherCreate) (uint64, error) {
+func (r *TeacherRepo) Create(teacher domain.TeacherCreateDTO) (uint64, error) {
+	var id uint64
 	query, args, err := r.psql.Insert("teachers").
-		Columns("short_name", "full_name").
-		Values(teacher.ShortName, teacher.FullName).
+		Columns("first_name", "last_name", "surname", "schedule_id").
+		Values(teacher.FirstName, teacher.LastName, teacher.Surname, teacher.ScheduleID).
 		Suffix("RETURNING id").
 		ToSql()
+
 	if err != nil {
 		return 0, err
 	}
 
-	var id uint64
-	err = r.db.QueryRow(query, args...).Scan(&id)
-	if err != nil {
+	if err := r.db.QueryRow(query, args...).Scan(&id); err != nil {
 		return 0, err
 	}
+
 	return id, nil
 }
 
 func (r *TeacherRepo) GetByID(id uint64) (domain.Teacher, error) {
-	query, args, err := r.psql.Select("*").From("teachers").
+	var teacher domain.Teacher
+	query, args, err := r.psql.Select("*").
+		From("teachers").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()
+
 	if err != nil {
 		return domain.Teacher{}, err
 	}
 
-	var teacher domain.Teacher
-	err = r.db.QueryRow(query, args...).Scan(&teacher.ID, &teacher.ShortName, &teacher.FullName)
-	if err != nil {
+	if err := r.db.Get(&teacher, query, args...); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.Teacher{}, apperror.ErrNotFound
+		}
 		return domain.Teacher{}, err
 	}
+
 	return teacher, nil
 }
 
-func (r *TeacherRepo) GetAll() ([]domain.Teacher, error) {
-	query, args, err := r.psql.Select("*").From("teachers").ToSql()
+func (r *TeacherRepo) GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.Teacher, uint64, error) {
+	var (
+		teachers []domain.Teacher = make([]domain.Teacher, 0)
+		total    uint64
+	)
+	countQuery, countArgs, err := r.psql.Select("COUNT(*)").
+		From("teachers").
+		Where(squirrel.Eq{"schedule_id": scheduleID}).
+		ToSql()
 	if err != nil {
-		return nil, err
+		return teachers, total, err
 	}
 
-	rows, err := r.db.Query(query, args...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var teachers []domain.Teacher
-	for rows.Next() {
-		var teacher domain.Teacher
-		if err := rows.Scan(&teacher.ID, &teacher.ShortName, &teacher.FullName); err != nil {
-			return nil, err
+	if err := r.db.Get(&total, countQuery, countArgs...); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return teachers, total, apperror.ErrNotFound
 		}
-		teachers = append(teachers, teacher)
+		return teachers, total, err
 	}
-	return teachers, nil
+
+	query, args, err := r.psql.Select("*").
+		From("teachers").
+		Where(squirrel.Eq{"schedule_id": scheduleID}).
+		Limit(limit).
+		Offset(offset).
+		OrderBy("id DESC").
+		ToSql()
+
+	if err != nil {
+		return teachers, total, err
+	}
+
+	if err := r.db.Select(&teachers, query, args...); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return teachers, total, apperror.ErrNotFound
+		}
+		return teachers, total, err
+	}
+
+	return teachers, total, nil
 }
 
-func (r *TeacherRepo) Update(id uint64, update domain.TeacherUpdate) error {
+func (r *TeacherRepo) Update(id uint64, update domain.TeacherUpdateDTO) error {
 	q := r.psql.Update("teachers").Where(squirrel.Eq{"id": id})
 
-	if update.ShortName != nil {
-		q = q.Set("short_name", *update.ShortName)
+	if update.FirstName != nil {
+		q = q.Set("first_name", *update.FirstName)
 	}
-	if update.FullName != nil {
-		q = q.Set("full_name", *update.FullName)
+	if update.LastName != nil {
+		q = q.Set("last_name", *update.LastName)
+	}
+	if update.Surname != nil {
+		q = q.Set("surname", *update.Surname)
 	}
 
 	query, args, err := q.ToSql()
@@ -90,18 +122,25 @@ func (r *TeacherRepo) Update(id uint64, update domain.TeacherUpdate) error {
 		return err
 	}
 
-	_, err = r.db.Exec(query, args...)
-	return err
+	if _, err := r.db.Exec(query, args...); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *TeacherRepo) Delete(id uint64) error {
 	query, args, err := r.psql.Delete("teachers").
 		Where(squirrel.Eq{"id": id}).
 		ToSql()
+
 	if err != nil {
 		return err
 	}
 
-	_, err = r.db.Exec(query, args...)
-	return err
+	if _, err := r.db.Exec(query, args...); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -3,12 +3,13 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"slices"
 	"strings"
 	"uni-schedule-backend/internal/apperror"
 	"uni-schedule-backend/internal/domain"
+
+	"github.com/labstack/echo/v4"
 )
 
 func (c *Controller) requiredRolesMiddleware(roles ...domain.Role) echo.MiddlewareFunc {

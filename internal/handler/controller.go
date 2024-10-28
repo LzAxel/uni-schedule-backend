@@ -2,13 +2,13 @@ package handler
 
 import (
 	"fmt"
+	_ "uni-schedule-backend/docs"
+	"uni-schedule-backend/internal/config"
+	"uni-schedule-backend/internal/service"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	_ "uni-schedule-backend/docs"
-	"uni-schedule-backend/internal/config"
-	"uni-schedule-backend/internal/domain"
-	"uni-schedule-backend/internal/service"
 )
 
 type Controller struct {
@@ -49,31 +49,51 @@ func (c *Controller) initRoutes() {
 			auth.POST("/refresh", c.AuthRefresh)
 		}
 
-		schedule := v1api.Group("/schedule")
+		schedule := v1api.Group("/schedules")
 		{
-			schedule.POST("", c.CreateSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
 			schedule.GET("/slug/:slug", c.GetScheduleBySlug)
-			schedule.PATCH("/:id", c.UpdateSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin, domain.RoleScheduleEditor))
-			schedule.DELETE("/:id", c.DeleteSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			schedule.GET("/my", c.GetMySchedules, c.authMiddleware)
+			schedule.POST("", c.CreateSchedule, c.authMiddleware)
+			schedule.PATCH("/:id", c.UpdateSchedule, c.authMiddleware)
+			schedule.DELETE("/:id", c.DeleteSchedule, c.authMiddleware)
 
-			schedule.POST("/:schedule_id/slot", c.AddPairToSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
-			schedule.DELETE("/slot/:slot_id", c.DeleteSlotFromSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
-			schedule.PATCH("/slot/:slot_id", c.UpdateSlotInSchedule, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			schedule.GET("/:schedule_id/teachers", c.GetScheduleTeachers, c.authMiddleware)
+			schedule.GET("/:schedule_id/subjects", c.GetScheduleSubjects, c.authMiddleware)
+			schedule.GET("/:schedule_id/classes", c.GetScheduleClasses, c.authMiddleware)
 		}
 
-		teacher := v1api.Group("/teacher")
+		entries := v1api.Group("/entries")
 		{
-			teacher.POST("", c.CreateTeacher, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
-			teacher.PATCH("/:id", c.UpdateTeacher, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
-			teacher.DELETE("/:id", c.DeleteTeacher, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			entries.POST("", c.CreateEntry, c.authMiddleware)
+			entries.GET("/:id", c.GetEntry, c.authMiddleware)
+			entries.PATCH("/:id", c.UpdateEntry, c.authMiddleware)
+			entries.DELETE("/:id", c.DeleteEntry, c.authMiddleware)
 		}
 
-		lesson := v1api.Group("/lesson")
+		teacher := v1api.Group("/teachers")
 		{
-			lesson.POST("", c.CreateLesson, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
-			lesson.PATCH("/:id", c.UpdateLesson, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
-			lesson.DELETE("/:id", c.DeleteLesson, c.authMiddleware, c.requiredRolesMiddleware(domain.RoleAdmin))
+			teacher.POST("", c.CreateTeacher, c.authMiddleware)
+			teacher.GET("/:id", c.GetTeacher, c.authMiddleware)
+			teacher.PATCH("/:id", c.UpdateTeacher, c.authMiddleware)
+			teacher.DELETE("/:id", c.DeleteTeacher, c.authMiddleware)
 		}
+
+		subjects := v1api.Group("/subjects")
+		{
+			subjects.GET("/:id", c.GetSubject, c.authMiddleware)
+			subjects.POST("", c.CreateSubject, c.authMiddleware)
+			subjects.PATCH("/:id", c.UpdateSubject, c.authMiddleware)
+			subjects.DELETE("/:id", c.DeleteSubject, c.authMiddleware)
+		}
+
+		classes := v1api.Group("/classes")
+		{
+			classes.GET("/:id", c.GetClass, c.authMiddleware)
+			classes.POST("", c.CreateClass, c.authMiddleware)
+			classes.PATCH("/:id", c.UpdateClass, c.authMiddleware)
+			classes.DELETE("/:id", c.DeleteClass, c.authMiddleware)
+		}
+
 		v1api.GET("/swagger/*", echoSwagger.WrapHandler)
 	}
 }

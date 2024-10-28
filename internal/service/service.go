@@ -6,8 +6,10 @@ import (
 	"uni-schedule-backend/internal/jwt"
 	"uni-schedule-backend/internal/repository"
 	authservice "uni-schedule-backend/internal/service/auth"
-	lessonservice "uni-schedule-backend/internal/service/lesson"
+	classservice "uni-schedule-backend/internal/service/class"
+	entryservice "uni-schedule-backend/internal/service/entry"
 	scheduleservice "uni-schedule-backend/internal/service/schedule"
+	subjectservice "uni-schedule-backend/internal/service/subject"
 	teacherservice "uni-schedule-backend/internal/service/teacher"
 	userservice "uni-schedule-backend/internal/service/user"
 )
@@ -16,35 +18,40 @@ type UserService interface {
 	Create(user domain.User) (uint64, error)
 	GetByID(id uint64) (domain.User, error)
 	GetByUsername(username string) (domain.User, error)
-	Update(id uint64, update domain.UserUpdateDTO) error
+	Update(userID uint64, id uint64, update domain.UserUpdateDTO) error
 	Delete(id uint64) error
 }
 
 type TeacherService interface {
-	Create(teacher domain.TeacherCreate) (uint64, error)
+	Create(teacher domain.TeacherCreateDTO) (uint64, error)
 	GetByID(id uint64) (domain.Teacher, error)
-	GetAll() ([]domain.Teacher, error)
-	Update(id uint64, update domain.TeacherUpdate) error
-	Delete(id uint64) error
-}
-
-type LessonService interface {
-	Create(lesson domain.LessonCreate) (uint64, error)
-	GetByID(id uint64) (domain.Lesson, error)
-	Update(id uint64, update domain.LessonUpdate) error
-	Delete(id uint64) error
+	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.Teacher, domain.Pagination, error)
+	Update(userID uint64, id uint64, update domain.TeacherUpdateDTO) error
+	Delete(userID uint64, id uint64) error
 }
 
 type ScheduleService interface {
-	CreateSchedule(schedule domain.ScheduleCreate) (uint64, error)
-	GetScheduleBySlug(slug string) (domain.ScheduleView, error)
-	UpdateSchedule(id uint64, update domain.ScheduleUpdate) error
-	DeleteSchedule(id uint64) error
+	Create(schedule domain.CreateScheduleDTO) (uint64, error)
+	GetByID(id uint64) (domain.ScheduleView, error)
+	GetBySlug(slug string) (domain.ScheduleView, error)
+	GetMy(userID uint64, limit uint64, offset uint64) ([]domain.Schedule, domain.Pagination, error)
+	Update(userID uint64, id uint64, update domain.UpdateScheduleDTO) error
+	Delete(userID uint64, id uint64) error
+}
 
-	CreateSlot(slot domain.ScheduleSlotCreate) (uint64, error)
-	GetSlotByID(id uint64) (domain.ScheduleSlot, error)
-	UpdateSlot(id uint64, update domain.ScheduleSlotUpdate) error
-	DeleteSlot(id uint64) error
+type EntryService interface {
+	Create(entry domain.CreateScheduleEntryDTO) (uint64, error)
+	GetByID(id uint64) (domain.ScheduleEntry, error)
+	Update(userID uint64, id uint64, update domain.UpdateScheduleEntryDTO) error
+	Delete(userID uint64, id uint64) error
+}
+
+type ClassService interface {
+	Create(class domain.CreateClassDTO) (uint64, error)
+	GetByID(id uint64) (domain.Class, error)
+	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.ClassView, domain.Pagination, error)
+	Update(userID uint64, id uint64, update domain.UpdateClassDTO) error
+	Delete(userID uint64, id uint64) error
 }
 
 type AuthService interface {
@@ -54,12 +61,22 @@ type AuthService interface {
 	GetUserFromAccessToken(accessToken string) (domain.User, error)
 }
 
+type SubjectService interface {
+	Create(subject domain.CreateSubjectDTO) (uint64, error)
+	GetByID(id uint64) (domain.Subject, error)
+	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.Subject, domain.Pagination, error)
+	Update(userID uint64, id uint64, update domain.UpdateSubjectDTO) error
+	Delete(userID uint64, id uint64) error
+}
+
 type Service struct {
 	Auth     AuthService
 	User     UserService
 	Teacher  TeacherService
-	Lesson   LessonService
 	Schedule ScheduleService
+	Subject  SubjectService
+	Entry    EntryService
+	Class    ClassService
 }
 
 func NewService(repository *repository.Repository) *Service {
@@ -69,8 +86,10 @@ func NewService(repository *repository.Repository) *Service {
 	return &Service{
 		Auth:     authservice.NewAuthService(repository.User, repository.Token, jwtManager, cfg.AppConfig.PasswordSalt),
 		User:     userservice.NewUserService(repository.User),
-		Teacher:  teacherservice.NewTeacherService(repository.Teacher),
-		Lesson:   lessonservice.NewLessonService(repository.Lesson),
-		Schedule: scheduleservice.NewScheduleService(repository.Schedule, repository.ScheduleSlot, repository.Lesson, repository.Teacher),
+		Entry:    entryservice.NewScheduleEntryService(repository.Entry, repository.Schedule),
+		Teacher:  teacherservice.NewTeacherService(repository.Teacher, repository.Schedule),
+		Schedule: scheduleservice.NewScheduleService(repository.Schedule, repository.Entry),
+		Subject:  subjectservice.NewSubjectService(repository.Subject, repository.Schedule),
+		Class:    classservice.NewClassService(repository.Class, repository.Schedule),
 	}
 }
