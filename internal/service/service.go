@@ -47,6 +47,7 @@ type EntryService interface {
 }
 
 type ClassService interface {
+	AddClassWithEntry(dto domain.CreateClassWithEntryDTO) (uint64, error)
 	Create(class domain.CreateClassDTO) (uint64, error)
 	GetByID(id uint64) (domain.Class, error)
 	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.ClassView, domain.Pagination, error)
@@ -90,6 +91,6 @@ func NewService(repository *repository.Repository) *Service {
 		Teacher:  teacherservice.NewTeacherService(repository.Teacher, repository.Schedule),
 		Schedule: scheduleservice.NewScheduleService(repository.Schedule, repository.Entry),
 		Subject:  subjectservice.NewSubjectService(repository.Subject, repository.Schedule),
-		Class:    classservice.NewClassService(repository.Class, repository.Schedule),
+		Class:    classservice.NewClassService(repository.Class, repository.Schedule, repository.Entry),
 	}
 }

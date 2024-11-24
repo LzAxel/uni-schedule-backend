@@ -12,7 +12,7 @@ var (
 	ErrInvalidLoginOrPassword     = New(ErrorTypeForbidden, "Invalid login or password", nil)
 	ErrInvalidAuthorizationHeader = New(ErrorTypeUnauthorized, "Invalid authorization header", nil)
 	ErrInvalidAccessToken         = New(ErrorTypeUnauthorized, "Invalid access token", nil)
-	ErrInvalidRefreshToken        = New(ErrorTypeUnauthorized, "Invalid refresh token", nil)
+	ErrInvalidRefreshToken        = New(ErrorTypeBadRequest, "Invalid refresh token", nil)
 	ErrAccessTokenIsExpired       = New(ErrorTypeUnauthorized, "Access token is expired", nil)
 	ErrRefreshTokenIsExpired      = New(ErrorTypeUnauthorized, "Refresh token is expired", nil)
 
@@ -21,14 +21,16 @@ var (
 
 	ErrSlugAlreadyInUse = New(ErrorTypeConflict, "Slug already in use", nil)
 	ErrInvalidSlug      = New(ErrorTypeBadRequest, "Invalid slug", nil)
+	ErrInvalidTitle     = New(ErrorTypeBadRequest, "Invalid title", nil)
 
 	ErrDontHavePermission = New(ErrorTypeForbidden, "You don't have permission", nil)
 
-	ErrScheduleNotFound     = New(ErrorTypeNotFound, "Schedule not found", nil)
-	ErrEmptyShortName       = New(ErrorTypeBadRequest, "Short name is empty", nil)
-	ErrEmptyScheduleSlug    = New(ErrorTypeBadRequest, "Schedule slug is empty", nil)
-	ErrEmptyScheduleName    = New(ErrorTypeBadRequest, "Schedule name is empty", nil)
-	ErrInvalidWeekdayNumber = New(ErrorTypeBadRequest, "Invalid weekday number. Should be from 0 to 6", nil)
+	ErrScheduleNotFound       = New(ErrorTypeNotFound, "Schedule not found", nil)
+	ErrEmptyShortName         = New(ErrorTypeBadRequest, "Short name is empty", nil)
+	ErrEmptyScheduleSlug      = New(ErrorTypeBadRequest, "Schedule slug is empty", nil)
+	ErrEmptyScheduleName      = New(ErrorTypeBadRequest, "Schedule name is empty", nil)
+	ErrInvalidWeekdayNumber   = New(ErrorTypeBadRequest, "Invalid weekday number. Should be from 0 to 6", nil)
+	ErrClassInEntryAlreadySet = New(ErrorTypeConflict, "Class in this entry position already set", nil)
 )
 
 func NewErrUserShoutHaveRole(role ...domain.Role) error {

@@ -181,6 +181,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/classes/entry": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Add Class and Entry using one request",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Class"
+                ],
+                "summary": "Add Class and Entry using one request",
+                "operationId": "classes-create-with-entry",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateClassWithEntryDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/classes/{id}": {
             "get": {
                 "security": [
@@ -291,6 +334,177 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/entries": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create Entry",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entry"
+                ],
+                "summary": "Create Entry",
+                "operationId": "entry-create",
+                "parameters": [
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.CreateScheduleEntryDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/entries/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get Entry by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entry"
+                ],
+                "summary": "Get Entry by ID",
+                "operationId": "entry-get-by-id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ScheduleEntry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete Entry",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entry"
+                ],
+                "summary": "Delete Entry",
+                "operationId": "entry-delete",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.IDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update Entry",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Entry"
+                ],
+                "summary": "Update Entry",
+                "operationId": "entry-update",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateScheduleEntryDTO"
+                        }
                     }
                 ],
                 "responses": {
@@ -1057,6 +1271,17 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.ClassPosition": {
+            "type": "string",
+            "enum": [
+                "even",
+                "odd"
+            ],
+            "x-enum-varnames": [
+                "ClassPositionEven",
+                "ClassPositionOdd"
+            ]
+        },
         "domain.ClassType": {
             "type": "string",
             "enum": [
@@ -1099,6 +1324,8 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "class_type",
+                "entry_id",
+                "position",
                 "schedule_id",
                 "subject_id",
                 "teacher_id"
@@ -1107,6 +1334,12 @@ const docTemplate = `{
                 "class_type": {
                     "$ref": "#/definitions/domain.ClassType"
                 },
+                "entry_id": {
+                    "type": "integer"
+                },
+                "position": {
+                    "$ref": "#/definitions/domain.ClassPosition"
+                },
                 "schedule_id": {
                     "type": "integer"
                 },
@@ -1114,6 +1347,76 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "teacher_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.CreateClassWithEntryDTO": {
+            "type": "object",
+            "required": [
+                "class_number",
+                "class_type",
+                "day",
+                "is_static",
+                "position",
+                "schedule_id",
+                "subject_id",
+                "teacher_id"
+            ],
+            "properties": {
+                "class_number": {
+                    "type": "integer"
+                },
+                "class_type": {
+                    "$ref": "#/definitions/domain.ClassType"
+                },
+                "day": {
+                    "$ref": "#/definitions/domain.Day"
+                },
+                "is_static": {
+                    "type": "boolean"
+                },
+                "position": {
+                    "$ref": "#/definitions/domain.ClassPosition"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "subject_id": {
+                    "type": "integer"
+                },
+                "teacher_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.CreateScheduleEntryDTO": {
+            "type": "object",
+            "required": [
+                "class_number",
+                "day",
+                "even_class_id",
+                "is_static",
+                "odd_class_id",
+                "schedule_id"
+            ],
+            "properties": {
+                "class_number": {
+                    "type": "integer"
+                },
+                "day": {
+                    "$ref": "#/definitions/domain.Day"
+                },
+                "even_class_id": {
+                    "type": "integer"
+                },
+                "is_static": {
+                    "type": "boolean"
+                },
+                "odd_class_id": {
+                    "type": "integer"
+                },
+                "schedule_id": {
                     "type": "integer"
                 }
             }
@@ -1180,6 +1483,7 @@ const docTemplate = `{
             "required": [
                 "id",
                 "slug",
+                "title",
                 "user_id"
             ],
             "properties": {
@@ -1189,7 +1493,45 @@ const docTemplate = `{
                 "slug": {
                     "type": "string"
                 },
+                "title": {
+                    "type": "string"
+                },
                 "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.ScheduleEntry": {
+            "type": "object",
+            "required": [
+                "class_number",
+                "day",
+                "even_class_id",
+                "id",
+                "is_static",
+                "odd_class_id",
+                "schedule_id"
+            ],
+            "properties": {
+                "class_number": {
+                    "type": "integer"
+                },
+                "day": {
+                    "$ref": "#/definitions/domain.Day"
+                },
+                "even_class_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_static": {
+                    "type": "boolean"
+                },
+                "odd_class_id": {
+                    "type": "integer"
+                },
+                "schedule_id": {
                     "type": "integer"
                 }
             }
@@ -1231,6 +1573,7 @@ const docTemplate = `{
                 "entries",
                 "id",
                 "slug",
+                "title",
                 "user_id"
             ],
             "properties": {
@@ -1244,6 +1587,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "slug": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "user_id": {
@@ -1396,6 +1742,33 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.UpdateScheduleEntryDTO": {
+            "type": "object",
+            "required": [
+                "class_number",
+                "day",
+                "even_class_id",
+                "is_static",
+                "odd_class_id"
+            ],
+            "properties": {
+                "class_number": {
+                    "type": "integer"
+                },
+                "day": {
+                    "$ref": "#/definitions/domain.Day"
+                },
+                "even_class_id": {
+                    "type": "integer"
+                },
+                "is_static": {
+                    "type": "boolean"
+                },
+                "odd_class_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.UpdateSubjectDTO": {
             "type": "object",
             "required": [
@@ -1425,10 +1798,14 @@ const docTemplate = `{
         "handler.CreateScheduleRequest": {
             "type": "object",
             "required": [
-                "slug"
+                "slug",
+                "title"
             ],
             "properties": {
                 "slug": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -1571,10 +1948,14 @@ const docTemplate = `{
         "handler.UpdateScheduleRequest": {
             "type": "object",
             "required": [
-                "slug"
+                "slug",
+                "title"
             ],
             "properties": {
                 "slug": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }

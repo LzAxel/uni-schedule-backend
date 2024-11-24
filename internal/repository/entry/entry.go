@@ -121,7 +121,7 @@ func (g *GetEntriesViewStruct) ToView() domain.ScheduleEntryView {
 	}
 
 	if g.OddClassID != nil {
-		entry.Even = &domain.ClassView{
+		entry.Odd = &domain.ClassView{
 			ID:        *g.OddClassID,
 			ClassType: *g.OddClassType,
 			Subject: domain.SubjectView{

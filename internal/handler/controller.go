@@ -90,6 +90,7 @@ func (c *Controller) initRoutes() {
 		{
 			classes.GET("/:id", c.GetClass, c.authMiddleware)
 			classes.POST("", c.CreateClass, c.authMiddleware)
+			classes.POST("/entry", c.AddClassWithEntry, c.authMiddleware)
 			classes.PATCH("/:id", c.UpdateClass, c.authMiddleware)
 			classes.DELETE("/:id", c.DeleteClass, c.authMiddleware)
 		}

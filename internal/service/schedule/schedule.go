@@ -26,6 +26,9 @@ func (s *ScheduleService) Create(schedule domain.CreateScheduleDTO) (uint64, err
 	if schedule.Slug == "" {
 		return 0, apperror.ErrInvalidSlug
 	}
+	if schedule.Title == "" {
+		return 0, apperror.ErrInvalidTitle
+	}
 
 	_, err := s.scheduleRepo.GetBySlug(schedule.Slug)
 	if err == nil {

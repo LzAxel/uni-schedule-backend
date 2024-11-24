@@ -1,13 +1,13 @@
 package domain
 
 type ScheduleEntry struct {
-	ID          uint64 `json:"id" db:"id"`
-	ScheduleID  uint64 `json:"schedule_id" db:"schedule_id"`
-	Day         Day    `json:"day" db:"day"`
-	ClassNumber int    `json:"class_number" db:"class_number"`
-	Even        *Class `json:"even" db:"even"`
-	Odd         *Class `json:"odd" db:"odd"`
-	IsStatic    bool   `json:"is_static" db:"is_static"`
+	ID          uint64  `json:"id" db:"id"`
+	ScheduleID  uint64  `json:"schedule_id" db:"schedule_id"`
+	Day         Day     `json:"day" db:"day"`
+	ClassNumber int     `json:"class_number" db:"class_number"`
+	EvenClassID *uint64 `json:"even_class_id" db:"even_class_id"`
+	OddClassID  *uint64 `json:"odd_class_id" db:"odd_class_id"`
+	IsStatic    bool    `json:"is_static" db:"is_static"`
 }
 
 type CreateScheduleEntryDTO struct {

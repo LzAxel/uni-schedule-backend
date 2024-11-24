@@ -9,7 +9,8 @@ import (
 )
 
 type CreateScheduleRequest struct {
-	Slug string `json:"slug"`
+	Slug  string `json:"slug"`
+	Title string `json:"title"`
 }
 
 // CreateSchedule
@@ -38,6 +39,7 @@ func (c *Controller) CreateSchedule(ctx echo.Context) error {
 	id, err := c.Service.Schedule.Create(domain.CreateScheduleDTO{
 		UserID: user.ID,
 		Slug:   req.Slug,
+		Title:  req.Title,
 	})
 	if err != nil {
 		return c.handleAppError(ctx, err)
@@ -110,7 +112,8 @@ func (c *Controller) GetMySchedules(ctx echo.Context) error {
 }
 
 type UpdateScheduleRequest struct {
-	Slug *string `json:"slug"`
+	Slug  *string `json:"slug"`
+	Title *string `json:"title"`
 }
 
 // UpdateSchedule
@@ -144,7 +147,8 @@ func (c *Controller) UpdateSchedule(ctx echo.Context) error {
 	}
 
 	err = c.Service.Schedule.Update(user.ID, id, domain.UpdateScheduleDTO{
-		Slug: req.Slug,
+		Slug:  req.Slug,
+		Title: req.Title,
 	})
 	if err != nil {
 		return c.handleAppError(ctx, err)

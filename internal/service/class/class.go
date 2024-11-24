@@ -8,15 +8,74 @@ import (
 
 type ClassService struct {
 	repo         repository.ClassRepository
+	entryRepo    repository.EntryRepository
 	scheduleRepo repository.ScheduleRepository
 }
 
-func NewClassService(repo repository.ClassRepository, scheduleRepo repository.ScheduleRepository) *ClassService {
-	return &ClassService{repo: repo, scheduleRepo: scheduleRepo}
+func NewClassService(repo repository.ClassRepository, scheduleRepo repository.ScheduleRepository, entryRepo repository.EntryRepository) *ClassService {
+	return &ClassService{repo: repo, scheduleRepo: scheduleRepo, entryRepo: entryRepo}
+}
+
+func (s *ClassService) AddClassWithEntry(dto domain.CreateClassWithEntryDTO) (uint64, error) {
+	createdClassID, err := s.repo.Create(domain.CreateClassDTO{
+		ScheduleID: dto.ScheduleID,
+		SubjectID:  dto.SubjectID,
+		TeacherID:  dto.TeacherID,
+		ClassType:  dto.ClassType,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	entryDTO := domain.CreateScheduleEntryDTO{
+		Day:         dto.Day,
+		ScheduleID:  dto.ScheduleID,
+		ClassNumber: dto.ClassNumber,
+		IsStatic:    dto.IsStatic,
+	}
+	if dto.Position == domain.ClassPositionEven {
+		entryDTO.EvenClassID = &createdClassID
+	} else {
+		entryDTO.OddClassID = &createdClassID
+	}
+
+	return s.entryRepo.Create(entryDTO)
 }
 
 func (s *ClassService) Create(class domain.CreateClassDTO) (uint64, error) {
-	return s.repo.Create(class)
+	entry, err := s.entryRepo.GetByID(class.EntryID)
+	if err != nil {
+		return 0, err
+	}
+
+	if entry.ScheduleID != class.ScheduleID {
+		return 0, apperror.ErrDontHavePermission
+	}
+
+	if class.Position == domain.ClassPositionEven && entry.EvenClassID != nil {
+		return 0, apperror.ErrClassInEntryAlreadySet
+	}
+	if class.Position == domain.ClassPositionOdd && entry.OddClassID != nil {
+		return 0, apperror.ErrClassInEntryAlreadySet
+	}
+
+	createdClassID, err := s.repo.Create(class)
+	if err != nil {
+		return 0, err
+	}
+
+	var updateEntry = domain.UpdateScheduleEntryDTO{}
+	if class.Position == domain.ClassPositionEven {
+		updateEntry.EvenClassID = &createdClassID
+	} else {
+		updateEntry.OddClassID = &createdClassID
+	}
+
+	if err := s.entryRepo.Update(entry.ID, updateEntry); err != nil {
+		return 0, err
+	}
+
+	return createdClassID, nil
 }
 
 func (s *ClassService) GetByID(id uint64) (domain.Class, error) {

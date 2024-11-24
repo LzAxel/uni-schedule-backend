@@ -25,8 +25,8 @@ func NewScheduleRepo(db *sqlx.DB) *ScheduleRepo {
 func (r *ScheduleRepo) Create(schedule domain.CreateScheduleDTO) (uint64, error) {
 	var id uint64
 	query, args, err := r.psql.Insert("schedules").
-		Columns("slug", "user_id").
-		Values(schedule.Slug, schedule.UserID).
+		Columns("slug", "title", "user_id").
+		Values(schedule.Slug, schedule.Title, schedule.UserID).
 		Suffix("RETURNING id").
 		ToSql()
 
@@ -145,6 +145,10 @@ func (r *ScheduleRepo) Update(id uint64, update domain.UpdateScheduleDTO) error 
 
 	if update.Slug != nil {
 		q = q.Set("slug", *update.Slug)
+	}
+
+	if update.Title != nil {
+		q = q.Set("title", *update.Title)
 	}
 
 	query, args, err := q.ToSql()

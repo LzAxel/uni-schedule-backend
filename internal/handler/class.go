@@ -93,6 +93,30 @@ func (c *Controller) CreateClass(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, NewIDResponse(id))
 }
 
+// AddClassWithEntry
+// @Summary Add Class and Entry using one request
+// @Description Add Class and Entry using one request
+// @Tags Class
+// @ID classes-create-with-entry
+// @Produce  json
+// @Param data body domain.CreateClassWithEntryDTO true "Data"
+// @Success 200 {object} IDResponse
+// @Failure 400 {object} ErrorResponse
+// @Security Bearer
+// @Router /classes/entry [post]
+func (c *Controller) AddClassWithEntry(ctx echo.Context) error {
+	var req domain.CreateClassWithEntryDTO
+	err := bindStruct(ctx, &req)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
+	id, err := c.Service.Class.AddClassWithEntry(req)
+	if err != nil {
+		return c.handleAppError(ctx, err)
+	}
+	return ctx.JSON(http.StatusOK, NewIDResponse(id))
+}
+
 // UpdateClass
 // @Summary Update Class
 // @Description Update Class

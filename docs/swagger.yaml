@@ -19,6 +19,14 @@ definitions:
     - subject_id
     - teacher_id
     type: object
+  domain.ClassPosition:
+    enum:
+    - even
+    - odd
+    type: string
+    x-enum-varnames:
+    - ClassPositionEven
+    - ClassPositionOdd
   domain.ClassType:
     enum:
     - lecture
@@ -51,6 +59,10 @@ definitions:
     properties:
       class_type:
         $ref: '#/definitions/domain.ClassType'
+      entry_id:
+        type: integer
+      position:
+        $ref: '#/definitions/domain.ClassPosition'
       schedule_id:
         type: integer
       subject_id:
@@ -59,9 +71,61 @@ definitions:
         type: integer
     required:
     - class_type
+    - entry_id
+    - position
     - schedule_id
     - subject_id
     - teacher_id
+    type: object
+  domain.CreateClassWithEntryDTO:
+    properties:
+      class_number:
+        type: integer
+      class_type:
+        $ref: '#/definitions/domain.ClassType'
+      day:
+        $ref: '#/definitions/domain.Day'
+      is_static:
+        type: boolean
+      position:
+        $ref: '#/definitions/domain.ClassPosition'
+      schedule_id:
+        type: integer
+      subject_id:
+        type: integer
+      teacher_id:
+        type: integer
+    required:
+    - class_number
+    - class_type
+    - day
+    - is_static
+    - position
+    - schedule_id
+    - subject_id
+    - teacher_id
+    type: object
+  domain.CreateScheduleEntryDTO:
+    properties:
+      class_number:
+        type: integer
+      day:
+        $ref: '#/definitions/domain.Day'
+      even_class_id:
+        type: integer
+      is_static:
+        type: boolean
+      odd_class_id:
+        type: integer
+      schedule_id:
+        type: integer
+    required:
+    - class_number
+    - day
+    - even_class_id
+    - is_static
+    - odd_class_id
+    - schedule_id
     type: object
   domain.CreateSubjectDTO:
     properties:
@@ -111,12 +175,40 @@ definitions:
         type: integer
       slug:
         type: string
+      title:
+        type: string
       user_id:
         type: integer
     required:
     - id
     - slug
+    - title
     - user_id
+    type: object
+  domain.ScheduleEntry:
+    properties:
+      class_number:
+        type: integer
+      day:
+        $ref: '#/definitions/domain.Day'
+      even_class_id:
+        type: integer
+      id:
+        type: integer
+      is_static:
+        type: boolean
+      odd_class_id:
+        type: integer
+      schedule_id:
+        type: integer
+    required:
+    - class_number
+    - day
+    - even_class_id
+    - id
+    - is_static
+    - odd_class_id
+    - schedule_id
     type: object
   domain.ScheduleEntryView:
     properties:
@@ -150,12 +242,15 @@ definitions:
         type: integer
       slug:
         type: string
+      title:
+        type: string
       user_id:
         type: integer
     required:
     - entries
     - id
     - slug
+    - title
     - user_id
     type: object
   domain.Subject:
@@ -258,6 +353,25 @@ definitions:
     - subject_id
     - teacher_id
     type: object
+  domain.UpdateScheduleEntryDTO:
+    properties:
+      class_number:
+        type: integer
+      day:
+        $ref: '#/definitions/domain.Day'
+      even_class_id:
+        type: integer
+      is_static:
+        type: boolean
+      odd_class_id:
+        type: integer
+    required:
+    - class_number
+    - day
+    - even_class_id
+    - is_static
+    - odd_class_id
+    type: object
   domain.UpdateSubjectDTO:
     properties:
       name:
@@ -279,8 +393,11 @@ definitions:
     properties:
       slug:
         type: string
+      title:
+        type: string
     required:
     - slug
+    - title
     type: object
   handler.ErrorResponse:
     properties:
@@ -375,8 +492,11 @@ definitions:
     properties:
       slug:
         type: string
+      title:
+        type: string
     required:
     - slug
+    - title
     type: object
 host: localhost:3000
 info:
@@ -576,6 +696,142 @@ paths:
       summary: Update Class
       tags:
       - Class
+  /classes/entry:
+    post:
+      description: Add Class and Entry using one request
+      operationId: classes-create-with-entry
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateClassWithEntryDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Add Class and Entry using one request
+      tags:
+      - Class
+  /entries:
+    post:
+      description: Create Entry
+      operationId: entry-create
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateScheduleEntryDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create Entry
+      tags:
+      - Entry
+  /entries/{id}:
+    delete:
+      description: Delete Entry
+      operationId: entry-delete
+      parameters:
+      - description: Entry ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete Entry
+      tags:
+      - Entry
+    get:
+      description: Get Entry by ID
+      operationId: entry-get-by-id
+      parameters:
+      - description: Entry ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ScheduleEntry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Entry by ID
+      tags:
+      - Entry
+    patch:
+      description: Update Entry
+      operationId: entry-update
+      parameters:
+      - description: Entry ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateScheduleEntryDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.IDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update Entry
+      tags:
+      - Entry
   /schedules:
     post:
       consumes:
