@@ -1,14 +1,5 @@
 package domain
 
-type ClassType string
-
-const (
-	Lecture  ClassType = "lecture"
-	Practice ClassType = "practice"
-	Lab      ClassType = "lab"
-	Combined ClassType = "combined"
-)
-
 type Day string
 
 const (

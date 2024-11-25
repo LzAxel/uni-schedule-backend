@@ -1,54 +1,50 @@
-CREATE TABLE IF NOT EXISTS users
-(
-    id            BIGSERIAL PRIMARY KEY,
-    username      TEXT        NOT NULL UNIQUE,
-    password_hash TEXT        NOT NULL,
-    role          SMALLINT    NOT NULL,
-    created_at    TIMESTAMPTZ NOT NULL
-);
-CREATE TABLE schedules
-(
-    id      SERIAL PRIMARY KEY,
-    user_id INTEGER      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    slug    VARCHAR(100) NOT NULL UNIQUE
-);
-CREATE TABLE teachers
-(
-    id         SERIAL PRIMARY KEY,
-    first_name VARCHAR(50) NOT NULL,
-    last_name  VARCHAR(50) NOT NULL,
-    surname    VARCHAR(50) NOT NULL,
-    schedule_id INTEGER     NOT NULL REFERENCES schedules (id) ON DELETE CASCADE
-);
-CREATE TABLE subjects
-(
-    id   SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    schedule_id INTEGER     NOT NULL REFERENCES schedules (id) ON DELETE CASCADE
-);
-CREATE TABLE classes
-(
-    id         SERIAL PRIMARY KEY,
-    schedule_id INTEGER     NOT NULL REFERENCES schedules (id) ON DELETE CASCADE,
-    subject_id INTEGER     NOT NULL REFERENCES subjects (id) ON DELETE CASCADE,
-    teacher_id INTEGER     NOT NULL REFERENCES teachers (id) ON DELETE SET NULL,
-    class_type VARCHAR(20) NOT NULL CHECK (class_type IN ('lecture', 'practice', 'lab', 'combined'))
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password_hash bytea NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    role SMALLINT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE TABLE schedule_entries
-(
-    id            SERIAL PRIMARY KEY,
-    day           VARCHAR(10) NOT NULL CHECK (day IN
-                                              ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday')),
-    class_number  INTEGER     NOT NULL,
-    even_class_id INTEGER     REFERENCES classes (id) ON DELETE SET NULL,
-    odd_class_id  INTEGER     REFERENCES classes (id) ON DELETE SET NULL,
-    is_static     BOOLEAN     NOT NULL,
-    schedule_id   INTEGER     NOT NULL REFERENCES schedules (id) ON DELETE CASCADE
+CREATE TABLE refresh_tokens (
+    user_id INT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL,
+    updated_at TIMESTAMP DEFAULT NOW()
 );
-CREATE TABLE IF NOT EXISTS refresh_tokens
-(
-    user_id    BIGINT REFERENCES users (id) NOT NULL UNIQUE,
-    token      TEXT                         NOT NULL,
-    updated_at TIMESTAMPTZ                  NOT NULL
+
+
+CREATE TABLE schedules (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    slug VARCHAR(100) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE teachers (
+    id SERIAL PRIMARY KEY,
+    schedule_id INT NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    surname VARCHAR(50),
+    UNIQUE (schedule_id, first_name, last_name, surname)
+);
+
+CREATE TABLE subjects (
+    id SERIAL PRIMARY KEY,
+    schedule_id INT NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    UNIQUE (schedule_id, name)
+);
+
+CREATE TABLE classes (
+    id SERIAL PRIMARY KEY,
+    schedule_id INT NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
+    teacher_id INT NOT NULL REFERENCES teachers(id) ON DELETE CASCADE,
+    subject_id INT NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+    class_type VARCHAR(20) NOT NULL CHECK (class_type IN ('lecture', 'practice', 'lab', 'combined')),
+    day_of_week VARCHAR(20) NOT NULL CHECK (day_of_week IN ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday')),
+    class_number SMALLINT NOT NULL CHECK (class_number > 0),
+    even_week BOOLEAN
 );

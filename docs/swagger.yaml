@@ -4,7 +4,13 @@ definitions:
     properties:
       class_type:
         $ref: '#/definitions/domain.ClassType'
+      day_of_week:
+        $ref: '#/definitions/domain.Day'
+      even_week:
+        type: boolean
       id:
+        type: integer
+      number:
         type: integer
       schedule_id:
         type: integer
@@ -14,19 +20,14 @@ definitions:
         type: integer
     required:
     - class_type
+    - day_of_week
+    - even_week
     - id
+    - number
     - schedule_id
     - subject_id
     - teacher_id
     type: object
-  domain.ClassPosition:
-    enum:
-    - even
-    - odd
-    type: string
-    x-enum-varnames:
-    - ClassPositionEven
-    - ClassPositionOdd
   domain.ClassType:
     enum:
     - lecture
@@ -35,15 +36,21 @@ definitions:
     - combined
     type: string
     x-enum-varnames:
-    - Lecture
-    - Practice
-    - Lab
-    - Combined
+    - ClassTypeLecture
+    - ClassTypePractice
+    - ClassTypeLab
+    - ClassTypeCombined
   domain.ClassView:
     properties:
       class_type:
         $ref: '#/definitions/domain.ClassType'
+      day_of_week:
+        $ref: '#/definitions/domain.Day'
+      even_week:
+        type: boolean
       id:
+        type: integer
+      number:
         type: integer
       subject:
         $ref: '#/definitions/domain.SubjectView'
@@ -51,7 +58,10 @@ definitions:
         $ref: '#/definitions/domain.TeacherView'
     required:
     - class_type
+    - day_of_week
+    - even_week
     - id
+    - number
     - subject
     - teacher
     type: object
@@ -59,10 +69,12 @@ definitions:
     properties:
       class_type:
         $ref: '#/definitions/domain.ClassType'
-      entry_id:
+      day_of_week:
+        $ref: '#/definitions/domain.Day'
+      even_week:
+        type: boolean
+      number:
         type: integer
-      position:
-        $ref: '#/definitions/domain.ClassPosition'
       schedule_id:
         type: integer
       subject_id:
@@ -71,61 +83,12 @@ definitions:
         type: integer
     required:
     - class_type
-    - entry_id
-    - position
+    - day_of_week
+    - even_week
+    - number
     - schedule_id
     - subject_id
     - teacher_id
-    type: object
-  domain.CreateClassWithEntryDTO:
-    properties:
-      class_number:
-        type: integer
-      class_type:
-        $ref: '#/definitions/domain.ClassType'
-      day:
-        $ref: '#/definitions/domain.Day'
-      is_static:
-        type: boolean
-      position:
-        $ref: '#/definitions/domain.ClassPosition'
-      schedule_id:
-        type: integer
-      subject_id:
-        type: integer
-      teacher_id:
-        type: integer
-    required:
-    - class_number
-    - class_type
-    - day
-    - is_static
-    - position
-    - schedule_id
-    - subject_id
-    - teacher_id
-    type: object
-  domain.CreateScheduleEntryDTO:
-    properties:
-      class_number:
-        type: integer
-      day:
-        $ref: '#/definitions/domain.Day'
-      even_class_id:
-        type: integer
-      is_static:
-        type: boolean
-      odd_class_id:
-        type: integer
-      schedule_id:
-        type: integer
-    required:
-    - class_number
-    - day
-    - even_class_id
-    - is_static
-    - odd_class_id
-    - schedule_id
     type: object
   domain.CreateSubjectDTO:
     properties:
@@ -153,6 +116,16 @@ definitions:
     - Thursday
     - Friday
     - Saturday
+  domain.DayGroupedClassesView:
+    additionalProperties:
+      $ref: '#/definitions/domain.NumberGroupedClassesView'
+    type: object
+  domain.NumberGroupedClassesView:
+    additionalProperties:
+      items:
+        $ref: '#/definitions/domain.ClassView'
+      type: array
+    type: object
   domain.Pagination:
     properties:
       limit:
@@ -171,6 +144,8 @@ definitions:
     type: object
   domain.Schedule:
     properties:
+      created_at:
+        type: string
       id:
         type: integer
       slug:
@@ -180,64 +155,16 @@ definitions:
       user_id:
         type: integer
     required:
+    - created_at
     - id
     - slug
     - title
     - user_id
     type: object
-  domain.ScheduleEntry:
-    properties:
-      class_number:
-        type: integer
-      day:
-        $ref: '#/definitions/domain.Day'
-      even_class_id:
-        type: integer
-      id:
-        type: integer
-      is_static:
-        type: boolean
-      odd_class_id:
-        type: integer
-      schedule_id:
-        type: integer
-    required:
-    - class_number
-    - day
-    - even_class_id
-    - id
-    - is_static
-    - odd_class_id
-    - schedule_id
-    type: object
-  domain.ScheduleEntryView:
-    properties:
-      class_number:
-        type: integer
-      day:
-        $ref: '#/definitions/domain.Day'
-      even:
-        $ref: '#/definitions/domain.ClassView'
-      id:
-        type: integer
-      is_static:
-        type: boolean
-      odd:
-        $ref: '#/definitions/domain.ClassView'
-    required:
-    - class_number
-    - day
-    - even
-    - id
-    - is_static
-    - odd
-    type: object
   domain.ScheduleView:
     properties:
       entries:
-        items:
-          $ref: '#/definitions/domain.ScheduleEntryView'
-        type: array
+        $ref: '#/definitions/domain.DayGroupedClassesView'
       id:
         type: integer
       slug:
@@ -344,33 +271,23 @@ definitions:
     properties:
       class_type:
         $ref: '#/definitions/domain.ClassType'
+      day_of_week:
+        $ref: '#/definitions/domain.Day'
+      even_week:
+        type: boolean
+      number:
+        type: integer
       subject_id:
         type: integer
       teacher_id:
         type: integer
     required:
     - class_type
+    - day_of_week
+    - even_week
+    - number
     - subject_id
     - teacher_id
-    type: object
-  domain.UpdateScheduleEntryDTO:
-    properties:
-      class_number:
-        type: integer
-      day:
-        $ref: '#/definitions/domain.Day'
-      even_class_id:
-        type: integer
-      is_static:
-        type: boolean
-      odd_class_id:
-        type: integer
-    required:
-    - class_number
-    - day
-    - even_class_id
-    - is_static
-    - odd_class_id
     type: object
   domain.UpdateSubjectDTO:
     properties:
@@ -411,18 +328,6 @@ definitions:
       data:
         items:
           $ref: '#/definitions/domain.Schedule'
-        type: array
-      pagination:
-        $ref: '#/definitions/domain.Pagination'
-    required:
-    - data
-    - pagination
-    type: object
-  handler.GetScheduleClassesResponse:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/domain.ClassView'
         type: array
       pagination:
         $ref: '#/definitions/domain.Pagination'
@@ -696,142 +601,6 @@ paths:
       summary: Update Class
       tags:
       - Class
-  /classes/entry:
-    post:
-      description: Add Class and Entry using one request
-      operationId: classes-create-with-entry
-      parameters:
-      - description: Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/domain.CreateClassWithEntryDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.IDResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - Bearer: []
-      summary: Add Class and Entry using one request
-      tags:
-      - Class
-  /entries:
-    post:
-      description: Create Entry
-      operationId: entry-create
-      parameters:
-      - description: Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/domain.CreateScheduleEntryDTO'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/handler.IDResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - Bearer: []
-      summary: Create Entry
-      tags:
-      - Entry
-  /entries/{id}:
-    delete:
-      description: Delete Entry
-      operationId: entry-delete
-      parameters:
-      - description: Entry ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.IDResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - Bearer: []
-      summary: Delete Entry
-      tags:
-      - Entry
-    get:
-      description: Get Entry by ID
-      operationId: entry-get-by-id
-      parameters:
-      - description: Entry ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/domain.ScheduleEntry'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - Bearer: []
-      summary: Get Entry by ID
-      tags:
-      - Entry
-    patch:
-      description: Update Entry
-      operationId: entry-update
-      parameters:
-      - description: Entry ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/domain.UpdateScheduleEntryDTO'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.IDResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - Bearer: []
-      summary: Update Entry
-      tags:
-      - Entry
   /schedules:
     post:
       consumes:
@@ -920,40 +689,6 @@ paths:
       summary: Update Schedule
       tags:
       - Schedule
-  /schedules/{schedule_id}/classes:
-    get:
-      description: Get Schedule's Classes
-      operationId: classes-get-schedule
-      parameters:
-      - description: Schedule ID
-        in: path
-        name: schedule_id
-        required: true
-        type: integer
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      - description: Offset
-        in: query
-        name: offset
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.GetScheduleClassesResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - Bearer: []
-      summary: Get Schedule's Classes
-      tags:
-      - Class
   /schedules/{schedule_id}/subjects:
     get:
       description: Get Schedule's Subjects

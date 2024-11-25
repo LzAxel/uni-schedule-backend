@@ -7,7 +7,6 @@ import (
 	"uni-schedule-backend/internal/repository"
 	authservice "uni-schedule-backend/internal/service/auth"
 	classservice "uni-schedule-backend/internal/service/class"
-	entryservice "uni-schedule-backend/internal/service/entry"
 	scheduleservice "uni-schedule-backend/internal/service/schedule"
 	subjectservice "uni-schedule-backend/internal/service/subject"
 	teacherservice "uni-schedule-backend/internal/service/teacher"
@@ -39,18 +38,10 @@ type ScheduleService interface {
 	Delete(userID uint64, id uint64) error
 }
 
-type EntryService interface {
-	Create(entry domain.CreateScheduleEntryDTO) (uint64, error)
-	GetByID(id uint64) (domain.ScheduleEntry, error)
-	Update(userID uint64, id uint64, update domain.UpdateScheduleEntryDTO) error
-	Delete(userID uint64, id uint64) error
-}
-
 type ClassService interface {
-	AddClassWithEntry(dto domain.CreateClassWithEntryDTO) (uint64, error)
 	Create(class domain.CreateClassDTO) (uint64, error)
 	GetByID(id uint64) (domain.Class, error)
-	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.ClassView, domain.Pagination, error)
+	GetAll(scheduleID uint64) ([]domain.ClassView, error)
 	Update(userID uint64, id uint64, update domain.UpdateClassDTO) error
 	Delete(userID uint64, id uint64) error
 }
@@ -76,7 +67,6 @@ type Service struct {
 	Teacher  TeacherService
 	Schedule ScheduleService
 	Subject  SubjectService
-	Entry    EntryService
 	Class    ClassService
 }
 
@@ -87,10 +77,9 @@ func NewService(repository *repository.Repository) *Service {
 	return &Service{
 		Auth:     authservice.NewAuthService(repository.User, repository.Token, jwtManager, cfg.AppConfig.PasswordSalt),
 		User:     userservice.NewUserService(repository.User),
-		Entry:    entryservice.NewScheduleEntryService(repository.Entry, repository.Schedule),
 		Teacher:  teacherservice.NewTeacherService(repository.Teacher, repository.Schedule),
-		Schedule: scheduleservice.NewScheduleService(repository.Schedule, repository.Entry),
+		Schedule: scheduleservice.NewScheduleService(repository.Schedule, repository.Class),
 		Subject:  subjectservice.NewSubjectService(repository.Subject, repository.Schedule),
-		Class:    classservice.NewClassService(repository.Class, repository.Schedule, repository.Entry),
+		Class:    classservice.NewClassService(repository.Class, repository.Schedule),
 	}
 }

@@ -1,1 +1,0 @@
-ALTER TABLE "schedules" ADD COLUMN IF NOT EXISTS "title" text DEFAULT '';

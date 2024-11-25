@@ -1,12 +1,13 @@
 package user
 
 import (
-	"github.com/Masterminds/squirrel"
-	"github.com/jackc/pgerrcode"
-	"github.com/jmoiron/sqlx"
 	"uni-schedule-backend/internal/apperror"
 	"uni-schedule-backend/internal/domain"
 	"uni-schedule-backend/pkg/psql"
+
+	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgerrcode"
+	"github.com/jmoiron/sqlx"
 )
 
 type UserRepo struct {
@@ -29,7 +30,7 @@ func (r *UserRepo) Create(user domain.UserCreate) (uint64, error) {
 		MustSql()
 
 	var id uint64
-	err := r.db.QueryRow(query, args...).Scan(&id)
+	err := r.db.Get(&id, query, args...)
 	if err != nil {
 		if psql.IsPgErrorCode(err, pgerrcode.UniqueViolation) {
 			return 0, apperror.ErrAlreadyExists
@@ -45,7 +46,7 @@ func (r *UserRepo) GetByID(id uint64) (domain.User, error) {
 		MustSql()
 
 	var user domain.User
-	err := r.db.QueryRow(query, args...).Scan(&user.ID, &user.Username, &user.PasswordHash, &user.Role, &user.CreatedAt)
+	err := r.db.Get(&user, query, args...)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -58,7 +59,7 @@ func (r *UserRepo) GetByUsername(username string) (domain.User, error) {
 		MustSql()
 
 	var user domain.User
-	err := r.db.QueryRow(query, args...).Scan(&user.ID, &user.Username, &user.PasswordHash, &user.Role, &user.CreatedAt)
+	err := r.db.Get(&user, query, args...)
 	if err != nil {
 		if psql.IsNoRows(err) {
 			return domain.User{}, apperror.ErrNotFound

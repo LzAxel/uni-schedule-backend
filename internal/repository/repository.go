@@ -43,20 +43,15 @@ type SubjectRepository interface {
 	Delete(id uint64) error
 }
 
-type EntryRepository interface {
-	Create(entry domain.CreateScheduleEntryDTO) (uint64, error)
-	GetByID(id uint64) (domain.ScheduleEntry, error)
-	GetEntriesView(scheduleID uint64) ([]domain.ScheduleEntryView, error)
-	Update(id uint64, update domain.UpdateScheduleEntryDTO) error
-	Delete(id uint64) error
-}
-
 type ClassRepository interface {
 	Create(class domain.CreateClassDTO) (uint64, error)
+	CreateOrSplit(class domain.CreateClassDTO) (uint64, error)
 	GetByID(id uint64) (domain.Class, error)
-	GetAllViews(scheduleID uint64, limit uint64, offset uint64) ([]domain.ClassView, uint64, error)
+	GetAllByDayAndNumber(scheduleID uint64, day domain.Day, number uint64) ([]domain.Class, error)
+	GetAllViews(scheduleID uint64) (domain.ClassViews, uint64, error)
 	GetAll(scheduleID uint64, limit uint64, offset uint64) ([]domain.Class, uint64, error)
 	Update(id uint64, update domain.UpdateClassDTO) error
+	UpdateOrSwitch(id uint64, scheduleID uint64, update domain.UpdateClassDTO) error
 	Delete(id uint64) error
 }
 
@@ -67,5 +62,4 @@ type Repository struct {
 	Teacher  TeacherRepository
 	Class    ClassRepository
 	Schedule ScheduleRepository
-	Entry    EntryRepository
 }

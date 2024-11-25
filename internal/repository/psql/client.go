@@ -1,16 +1,16 @@
 package psql
 
 import (
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"uni-schedule-backend/internal/repository"
 	tokenrepo "uni-schedule-backend/internal/repository/auth"
 	classrepo "uni-schedule-backend/internal/repository/class"
-	entryrepo "uni-schedule-backend/internal/repository/entry"
 	"uni-schedule-backend/internal/repository/schedule"
 	subjectrepo "uni-schedule-backend/internal/repository/subject"
 	teacherrepo "uni-schedule-backend/internal/repository/teacher"
 	userrepo "uni-schedule-backend/internal/repository/user"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 func NewDBConnection(dsn string) (*sqlx.DB, error) {
@@ -32,7 +32,6 @@ func NewPostgresRepository(db *sqlx.DB) *repository.Repository {
 		Teacher:  teacherrepo.NewTeacherRepo(db),
 		Subject:  subjectrepo.NewSubjectRepo(db),
 		Schedule: schedule.NewScheduleRepo(db),
-		Entry:    entryrepo.NewEntryRepo(db),
 		Class:    classrepo.NewClassRepo(db),
 	}
 }

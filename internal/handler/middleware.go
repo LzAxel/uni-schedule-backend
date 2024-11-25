@@ -43,7 +43,7 @@ func (c *Controller) authMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		user, err := c.Service.Auth.GetUserFromAccessToken(authorizationSplitted[1])
 		if err != nil {
-			return c.handleAppError(ctx, err)
+			return c.handleAppError(ctx, apperror.ErrInvalidAuthorizationHeader)
 		}
 
 		addUserToContext(ctx, user)

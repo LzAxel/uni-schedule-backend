@@ -59,15 +59,6 @@ func (c *Controller) initRoutes() {
 
 			schedule.GET("/:schedule_id/teachers", c.GetScheduleTeachers, c.authMiddleware)
 			schedule.GET("/:schedule_id/subjects", c.GetScheduleSubjects, c.authMiddleware)
-			schedule.GET("/:schedule_id/classes", c.GetScheduleClasses, c.authMiddleware)
-		}
-
-		entries := v1api.Group("/entries")
-		{
-			entries.POST("", c.CreateEntry, c.authMiddleware)
-			entries.GET("/:id", c.GetEntry, c.authMiddleware)
-			entries.PATCH("/:id", c.UpdateEntry, c.authMiddleware)
-			entries.DELETE("/:id", c.DeleteEntry, c.authMiddleware)
 		}
 
 		teacher := v1api.Group("/teachers")
@@ -90,7 +81,6 @@ func (c *Controller) initRoutes() {
 		{
 			classes.GET("/:id", c.GetClass, c.authMiddleware)
 			classes.POST("", c.CreateClass, c.authMiddleware)
-			classes.POST("/entry", c.AddClassWithEntry, c.authMiddleware)
 			classes.PATCH("/:id", c.UpdateClass, c.authMiddleware)
 			classes.DELETE("/:id", c.DeleteClass, c.authMiddleware)
 		}

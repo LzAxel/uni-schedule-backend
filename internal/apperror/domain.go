@@ -25,12 +25,18 @@ var (
 
 	ErrDontHavePermission = New(ErrorTypeForbidden, "You don't have permission", nil)
 
-	ErrScheduleNotFound       = New(ErrorTypeNotFound, "Schedule not found", nil)
-	ErrEmptyShortName         = New(ErrorTypeBadRequest, "Short name is empty", nil)
-	ErrEmptyScheduleSlug      = New(ErrorTypeBadRequest, "Schedule slug is empty", nil)
-	ErrEmptyScheduleName      = New(ErrorTypeBadRequest, "Schedule name is empty", nil)
-	ErrInvalidWeekdayNumber   = New(ErrorTypeBadRequest, "Invalid weekday number. Should be from 0 to 6", nil)
-	ErrClassInEntryAlreadySet = New(ErrorTypeConflict, "Class in this entry position already set", nil)
+	ErrScheduleNotFound     = New(ErrorTypeNotFound, "Schedule not found", nil)
+	ErrEmptyShortName       = New(ErrorTypeBadRequest, "Short name is empty", nil)
+	ErrEmptyScheduleSlug    = New(ErrorTypeBadRequest, "Schedule slug is empty", nil)
+	ErrEmptyScheduleName    = New(ErrorTypeBadRequest, "Schedule name is empty", nil)
+	ErrInvalidWeekdayNumber = New(ErrorTypeBadRequest, "Invalid weekday number. Should be from 0 to 6", nil)
+
+	ErrClassWithSamePositionAlreadyExists = New(ErrorTypeConflict, "Class with same position already exists", nil)
+	ErrSingleClassAlreadySet              = New(ErrorTypeConflict, "Single class already set", nil)
+	ErrCannotSetSeveralSingleClasses      = New(ErrorTypeConflict, "Cannot set several single classes", nil)
+	ErrCannotSetSameClassesPositions      = New(ErrorTypeConflict, "Cannot set same classes positions", nil)
+	ErrClassesAlreadySet                  = New(ErrorTypeConflict, "Classes already set", nil)
+	ErrClassOnlyEvenOrSingleClass         = New(ErrorTypeConflict, "Can set only even(odd) or single class at a time", nil)
 )
 
 func NewErrUserShoutHaveRole(role ...domain.Role) error {

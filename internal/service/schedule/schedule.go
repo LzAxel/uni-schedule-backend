@@ -9,16 +9,16 @@ import (
 
 type ScheduleService struct {
 	scheduleRepo repository.ScheduleRepository
-	entryRepo    repository.EntryRepository
+	classesRepo  repository.ClassRepository
 }
 
 func NewScheduleService(
 	scheduleRepo repository.ScheduleRepository,
-	entryRepo repository.EntryRepository,
+	classRepo repository.ClassRepository,
 ) *ScheduleService {
 	return &ScheduleService{
 		scheduleRepo: scheduleRepo,
-		entryRepo:    entryRepo,
+		classesRepo:  classRepo,
 	}
 }
 
@@ -46,12 +46,12 @@ func (s *ScheduleService) GetByID(id uint64) (domain.ScheduleView, error) {
 	if err != nil {
 		return domain.ScheduleView{}, err
 	}
-	entries, err := s.entryRepo.GetEntriesView(schedule.ID)
+	classes, _, err := s.classesRepo.GetAllViews(schedule.ID)
 	if err != nil {
 		return domain.ScheduleView{}, err
 	}
 
-	return schedule.ToView(entries), nil
+	return schedule.ToView(classes.ToDayGroupedClassesView()), nil
 }
 
 func (s *ScheduleService) GetBySlug(slug string) (domain.ScheduleView, error) {
@@ -59,12 +59,12 @@ func (s *ScheduleService) GetBySlug(slug string) (domain.ScheduleView, error) {
 	if err != nil {
 		return domain.ScheduleView{}, err
 	}
-	entries, err := s.entryRepo.GetEntriesView(schedule.ID)
+	classes, _, err := s.classesRepo.GetAllViews(schedule.ID)
 	if err != nil {
 		return domain.ScheduleView{}, err
 	}
 
-	return schedule.ToView(entries), nil
+	return schedule.ToView(classes.ToDayGroupedClassesView()), nil
 }
 
 func (s *ScheduleService) GetMy(userID uint64, limit uint64, offset uint64) ([]domain.Schedule, domain.Pagination, error) {

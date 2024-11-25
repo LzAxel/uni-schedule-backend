@@ -7,44 +7,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type GetScheduleClassesResponse struct {
-	Data       []domain.ClassView `json:"data"`
-	Pagination domain.Pagination  `json:"pagination"`
-}
-
-// GetScheduleClasses
-// @Summary Get Schedule's Classes
-// @Description Get Schedule's Classes
-// @Tags Class
-// @ID classes-get-schedule
-// @Produce  json
-// @Param schedule_id path uint true "Schedule ID"
-// @Param limit query uint false "Limit"
-// @Param offset query uint false "Offset"
-// @Success 200 {object} GetScheduleClassesResponse
-// @Failure 400 {object} ErrorResponse
-// @Security Bearer
-// @Router /schedules/{schedule_id}/classes [get]
-func (c *Controller) GetScheduleClasses(ctx echo.Context) error {
-	scheduleID, err := parseIDParam(ctx, "schedule_id")
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-	limit, offset, err := getPagination(ctx)
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-	class, pagination, err := c.Service.Class.GetAll(scheduleID, limit, offset)
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-
-	return ctx.JSON(http.StatusOK, GetScheduleClassesResponse{
-		Data:       class,
-		Pagination: pagination,
-	})
-}
-
 // GetClass
 // @Summary Get Class By ID
 // @Description Get Class  By ID
@@ -87,30 +49,6 @@ func (c *Controller) CreateClass(ctx echo.Context) error {
 		return c.handleAppError(ctx, err)
 	}
 	id, err := c.Service.Class.Create(req)
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-	return ctx.JSON(http.StatusOK, NewIDResponse(id))
-}
-
-// AddClassWithEntry
-// @Summary Add Class and Entry using one request
-// @Description Add Class and Entry using one request
-// @Tags Class
-// @ID classes-create-with-entry
-// @Produce  json
-// @Param data body domain.CreateClassWithEntryDTO true "Data"
-// @Success 200 {object} IDResponse
-// @Failure 400 {object} ErrorResponse
-// @Security Bearer
-// @Router /classes/entry [post]
-func (c *Controller) AddClassWithEntry(ctx echo.Context) error {
-	var req domain.CreateClassWithEntryDTO
-	err := bindStruct(ctx, &req)
-	if err != nil {
-		return c.handleAppError(ctx, err)
-	}
-	id, err := c.Service.Class.AddClassWithEntry(req)
 	if err != nil {
 		return c.handleAppError(ctx, err)
 	}

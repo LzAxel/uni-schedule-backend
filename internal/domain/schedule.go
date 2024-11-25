@@ -1,10 +1,13 @@
 package domain
 
+import "time"
+
 type Schedule struct {
-	ID     uint64 `json:"id" db:"id"`
-	UserID uint64 `json:"user_id" db:"user_id"`
-	Slug   string `json:"slug" db:"slug"`
-	Title  string `json:"title" db:"title"`
+	ID        uint64    `json:"id" db:"id"`
+	UserID    uint64    `json:"user_id" db:"user_id"`
+	Slug      string    `json:"slug" db:"slug"`
+	Title     string    `json:"title" db:"title"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
 type CreateScheduleDTO struct {
@@ -19,19 +22,19 @@ type UpdateScheduleDTO struct {
 }
 
 type ScheduleView struct {
-	ID      uint64              `json:"id"`
-	UserID  uint64              `json:"user_id"`
-	Slug    string              `json:"slug"`
-	Title   string              `json:"title"`
-	Entries []ScheduleEntryView `json:"entries"`
+	ID      uint64                `json:"id"`
+	UserID  uint64                `json:"user_id"`
+	Slug    string                `json:"slug"`
+	Title   string                `json:"title"`
+	Entries DayGroupedClassesView `json:"entries"`
 }
 
-func (s Schedule) ToView(entries []ScheduleEntryView) ScheduleView {
+func (s Schedule) ToView(groupedClasses DayGroupedClassesView) ScheduleView {
 	return ScheduleView{
 		ID:      s.ID,
 		UserID:  s.UserID,
 		Slug:    s.Slug,
-		Entries: entries,
+		Entries: groupedClasses,
 		Title:   s.Title,
 	}
 }

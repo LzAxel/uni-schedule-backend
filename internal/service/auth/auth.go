@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"log"
 	"time"
 	"uni-schedule-backend/internal/apperror"
 	"uni-schedule-backend/internal/domain"
@@ -111,6 +112,7 @@ func (s *AuthService) GetUserFromAccessToken(accessToken string) (domain.User, e
 	if err != nil {
 		return domain.User{}, apperror.ErrInvalidAccessToken
 	}
+	log.Println("UserID:", userID)
 	user, err := s.userRepo.GetByID(userID)
 	if err != nil {
 		return domain.User{}, apperror.ErrUserNotFound
