@@ -34,7 +34,7 @@ func (s *ScheduleService) Create(schedule domain.CreateScheduleDTO) (uint64, err
 	if err == nil {
 		return 0, apperror.ErrSlugAlreadyInUse
 	}
-	if !errors.Is(err, apperror.ErrNotFound) {
+	if !errors.Is(err, apperror.ErrScheduleNotFound) {
 		return 0, err
 	}
 

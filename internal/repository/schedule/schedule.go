@@ -59,7 +59,7 @@ func (r *ScheduleRepo) GetByID(id uint64) (domain.Schedule, error) {
 	err = r.db.Get(&schedule, query, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Schedule{}, apperror.ErrNotFound
+			return domain.Schedule{}, apperror.ErrScheduleNotFound
 		}
 		return domain.Schedule{}, err
 	}
@@ -81,7 +81,7 @@ func (r *ScheduleRepo) GetBySlug(slug string) (domain.Schedule, error) {
 	err = r.db.Get(&schedule, query, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Schedule{}, apperror.ErrNotFound
+			return domain.Schedule{}, apperror.ErrScheduleNotFound
 		}
 		return domain.Schedule{}, err
 	}
