@@ -1,10 +1,12 @@
 package config
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
+	"os"
 	"sync"
 	"uni-schedule-backend/internal/jwt"
 	"uni-schedule-backend/internal/repository/psql"
+
+	"github.com/ilyakaznacheev/cleanenv"
 )
 
 const configPath = "./configs/dev.yml"
@@ -22,7 +24,14 @@ type Config struct {
 
 func GetConfig() Config {
 	once.Do(func() {
-		err := cleanenv.ReadConfig(configPath, &cfg)
+		_, err := os.Stat(configPath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				err = cleanenv.ReadEnv(&cfg)
+			}
+		} else {
+			err = cleanenv.ReadConfig(configPath, &cfg)
+		}
 		if err != nil {
 			panic(err)
 		}
