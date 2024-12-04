@@ -1,6 +1,12 @@
 name: Build and Deploy
 
+on:
+  push:
+    branches:
+      - "main"
 env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
   APP_PORT: ${{ secrets.APP_PORT }}
   APP_LOG_LEVEL: ${{ secrets.APP_LOG_LEVEL }}
   APP_IS_DEBUG: ${{ secrets.APP_IS_DEBUG }}
@@ -19,14 +25,6 @@ env:
   POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
   POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
   POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-
-on:
-  push:
-    branches:
-      - "main"
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
