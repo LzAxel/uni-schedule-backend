@@ -1,5 +1,25 @@
 name: Build and Deploy
 
+env:
+  APP_PORT: ${{ secrets.APP_PORT }}
+  APP_LOG_LEVEL: ${{ secrets.APP_LOG_LEVEL }}
+  APP_IS_DEBUG: ${{ secrets.APP_IS_DEBUG }}
+  APP_PASSWORD_SALT: ${{ secrets.APP_PASSWORD_SALT }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASS: ${{ secrets.DB_PASS }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_SSL_MODE: ${{ secrets.DB_SSL_MODE }}
+  JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+  JWT_ACCESS_TOKEN_LIFETIME: ${{ secrets.JWT_ACCESS_TOKEN_LIFETIME }}
+  JWT_REFRESH_TOKEN_LIFETIME: ${{ secrets.JWT_REFRESH_TOKEN_LIFETIME }}
+  JWT_ACCESS_TOKEN_SECRET: ${{ secrets.JWT_ACCESS_TOKEN_SECRET }}
+  JWT_REFRESH_TOKEN_SECRET: ${{ secrets.JWT_REFRESH_TOKEN_SECRET }}
+  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+
 on:
   push:
     branches:
