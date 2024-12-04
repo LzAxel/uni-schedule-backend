@@ -77,7 +77,7 @@ jobs:
         env:
           BACKEND_IMAGE: ${{ steps.meta.outputs.tags }}
         run: |
-          docker --context remote compose -f deployments/docker-compose.yml up -d
+          docker --context remote compose -f deployments/docker-compose.prod.yml up -d
 
       - name: cleanup
         run: rm -rf ~/.ssh
